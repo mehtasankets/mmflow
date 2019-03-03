@@ -1,5 +1,13 @@
 import React from 'react'
 import { render } from 'react-dom'
 import App from './containers/App'
+import { Provider } from 'mobx-react'
+import ExpensesStore from './store/ExpensesStore'
 
-render(<App />, document.getElementById('root'))
+const Root = (
+    <Provider ExpensesStore={ExpensesStore}>
+        <App />
+    </Provider>
+)
+
+render(Root, document.getElementById('root'))
