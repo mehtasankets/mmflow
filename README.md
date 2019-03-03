@@ -1,6 +1,6 @@
-# React-mobx demo application
+# MM Flow
 
-To learn react with mobx
+To manage Monthly Money Flow
 
 # To run
-npm run dev
+`npm run dev`
