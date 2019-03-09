@@ -4,7 +4,7 @@ import Expense from './Expense'
 class ExpensesStore {
     @observable expenses = []
 
-    @action addNewExpense = (id, description, amount) => this.expenses.push(new Expense(id, description, amount))
+    @action addNewExpense = (id, date, description, amount) => this.expenses.push(new Expense(id, date, description, amount))
 
     @computed get getCount() {
         return this.expenses.length

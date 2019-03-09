@@ -10,10 +10,12 @@
   "author": "mehtasankets (Sanket Mehta)",
   "license": "ISC",
   "dependencies": {
+    "flatpickr": "^4.5.7",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "react": "^16.8.3",
-    "react-dom": "^16.8.3"
+    "react-dom": "^16.8.3",
+    "react-flatpickr": "^3.7.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
