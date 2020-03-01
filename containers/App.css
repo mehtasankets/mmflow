@@ -1,56 +1,6 @@
-#new-expense { 
-  -webkit-user-select: none; /* Chrome/Safari */        
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+ */
-  margin: 1em 1em;
-  width: 150px; 
-  height: 30px; 
-  line-height: 30px;
-  background: teal;
-  color: white;
-  font-weight: 700;
-  text-align: center;
-  cursor: pointer;
-  border: 1px solid white;
-}
-
-#new-expense:hover { background: #666; }
-#new-expense:active { background: #444; }
-
-#new-expense-form { 
-  display: none;
-  border: 6px solid salmon; 
-  padding: 2em;
-  width: 400px;
-  text-align: center;
-  position: fixed;
-  top:50%;
-  left:50%;
-  transform: translate(-50%,-50%);
-  -webkit-transform: translate(-50%,-50%)
-  
-}
-
-input, textarea { 
-  margin: .8em auto;
-  font-family: inherit; 
-  text-transform: inherit; 
-  font-size: inherit;
-  
-  display: block; 
-  width: 280px; 
-  padding: .4em;
-}
-textarea { height: 80px; resize: none; }
-
-.formBtn { 
-  width: 140px;
-  display: inline-block;
-  
-  background: teal;
-  color: #fff;
-  font-weight: 100;
-  font-size: 1.2em;
-  border: none;
-  height: 30px;
+@media(min-width: 768px) {
+  .app {
+    max-width: calc(100% - 400px);
+    margin: 70px auto 10px auto;
+  }
 }

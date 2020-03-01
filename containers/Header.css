@@ -1,0 +1,21 @@
+.title_bar {
+  position: fixed;
+  overflow: hidden;
+  background-color: darkgreen;
+  padding: 15px 10px;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 10000;
+  box-shadow: 0 2px 6px 0 rgba(34,36,38,.15), 0 2px 18px 0 rgba(34,36,38,.17);
+}
+
+.title_bar > .title {
+  float: left;
+  overflow: hidden;
+  color: lightgoldenrodyellow;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 200px;
+}
