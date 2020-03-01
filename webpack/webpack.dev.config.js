@@ -24,6 +24,9 @@ module.exports = {
     },
     devServer: {
         contentBase: parentDir,
-        historyApiFallback: true
+        publicPath: '/pocket-tracker/',
+        historyApiFallback: true,
+        host: '0.0.0.0',
+        port: 8080
     }
 }
