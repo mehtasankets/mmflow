@@ -1,5 +1,9 @@
 package com.mehtasankets.mmflow
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.request.*
@@ -17,12 +21,23 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
+    val objectMapper = ObjectMapper().findAndRegisterModules()
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    val db = Db()
     routing {
         get("/get-expenses-for-month/{month?}") {
-            var month: Int = Integer.valueOf(call.parameters["month"] ?: ZonedDateTime.now().month.value.toString())
-            var str = "$month"
+            val month: Int = Integer.valueOf(call.parameters["month"] ?: ZonedDateTime.now().month.value.toString())
+            val expenses = db.fetchExpenses(Instant.EPOCH, Instant.now())
+            val serializedExpenses = objectMapper.writeValueAsString(expenses)
             call.response.header("Access-Control-Allow-Origin", "*")
-            call.respondText(str, ContentType.Application.Json)
+            call.respondText(serializedExpenses, ContentType.Application.Json)
+        }
+
+        get("/upsert/{expenses?}") {
+            val expenses = objectMapper.readValue<List<Expense>>(call.parameters["expenses"] ?: "[]")
+            val count = db.insertExpenses(expenses)
+            call.response.header("Access-Control-Allow-Origin", "*")
+            call.respondText(count.toString(), ContentType.Application.Json)
         }
     }
 }
