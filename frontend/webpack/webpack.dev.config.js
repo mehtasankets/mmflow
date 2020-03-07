@@ -5,6 +5,7 @@ var parentDir = path.join(__dirname, '../');
 
 module.exports = {
     entry: [
+        'babel-polyfill',
         path.join(parentDir, 'index.js')
     ],
     module: {
@@ -24,7 +25,7 @@ module.exports = {
     },
     devServer: {
         contentBase: parentDir,
-        publicPath: '/pocket-tracker/',
+        publicPath: '/mmflow/',
         historyApiFallback: true,
         host: '0.0.0.0',
         port: 8080

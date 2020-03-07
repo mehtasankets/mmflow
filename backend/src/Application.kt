@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.application.*
+import io.ktor.features.CORS
 import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.routing.*
@@ -21,6 +22,10 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
+    install(CORS) {
+        header(HttpHeaders.ContentType)
+        anyHost()
+    }
     val objectMapper = ObjectMapper().findAndRegisterModules()
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     val db = Db()
@@ -29,14 +34,12 @@ fun Application.module(testing: Boolean = false) {
             val month: Int = Integer.valueOf(call.parameters["month"] ?: ZonedDateTime.now().month.value.toString())
             val expenses = db.fetchExpenses(Instant.EPOCH, Instant.now())
             val serializedExpenses = objectMapper.writeValueAsString(expenses)
-            call.response.header("Access-Control-Allow-Origin", "*")
             call.respondText(serializedExpenses, ContentType.Application.Json)
         }
 
-        get("/upsert/{expenses?}") {
-            val expenses = objectMapper.readValue<List<Expense>>(call.parameters["expenses"] ?: "[]")
+        post("/upsert/") {
+            val expenses = objectMapper.readValue<List<Expense>>(call.receiveText() ?: "[]")
             val count = db.insertExpenses(expenses)
-            call.response.header("Access-Control-Allow-Origin", "*")
             call.respondText(count.toString(), ContentType.Application.Json)
         }
     }

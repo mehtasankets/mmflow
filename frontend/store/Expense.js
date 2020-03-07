@@ -4,18 +4,23 @@ export default class Expense {
     @observable id
     @observable date
     @observable description
+    @observable category
+    @observable paidBy
     @observable amount
 
-    constructor(id, date, description, amount) {
+    constructor(id, dateStr, description, category, paidBy, amount) {
         if (!id) {
             id = -1
         }
-        if(!date) {
-            date = new Date()
+        if(!dateStr) {
+            this.date = new Date()
+        } else {
+            this.date = new Date(Date.parse(dateStr))
         }
         this.id = id
-        this.date = date
         this.description = description
+        this.category = category
+        this.paidBy = paidBy
         this.amount = amount
     }
 }
