@@ -1,13 +1,13 @@
 import Expense from "../store/Expense";
 
-const webApiUrl = "http://localhost:8090/";
+const webApiUrl = "http://localhost:8090/expense/";
 
 class ExpenseService {
-    get = async (month) => {
+    get = async (startDate, endDate) => {
         const options = {
             method: "GET",
         }
-        const request = new Request(webApiUrl + "get-expenses-for-month/" + month, options);
+        const request = new Request(webApiUrl + `?startDate=${startDate}&endDate=${endDate}`, options);
         const response = await fetch(request);
         return response.json();
     }
@@ -19,7 +19,31 @@ class ExpenseService {
             headers,
             body: JSON.stringify(expenses)
         }
-        const request = new Request(webApiUrl + "upsert/", options);
+        const request = new Request(webApiUrl, options);
+        const response = await fetch(request);
+        return response.json();
+    }
+    put = async(expenses) => {
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        var options = {
+            method: "PUT",
+            headers,
+            body: JSON.stringify(expenses)
+        }
+        const request = new Request(webApiUrl, options);
+        const response = await fetch(request);
+        return response.json();
+    }
+    delete = async(expenseIds) => {
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        var options = {
+            method: "DELETE",
+            headers,
+            body: JSON.stringify(expenseIds)
+        }
+        const request = new Request(webApiUrl, options);
         const response = await fetch(request);
         return response.json();
     }

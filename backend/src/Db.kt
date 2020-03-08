@@ -2,9 +2,7 @@ package com.mehtasankets.mmflow
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.sql.DriverManager
-import java.sql.Timestamp
 import java.time.Instant
 
 
@@ -39,7 +37,46 @@ class Db() {
         return statement.executeUpdate()
     }
 
+    fun updateExpenses(expenses: List<Expense>): Int {
+        val query = """
+            UPDATE expenses 
+            SET
+                date = ?,
+                description = ?,
+                category = ?,
+                paid_by = ?,
+                amount = ?
+            WHERE id = ?
+        """.trimIndent()
+        val connection = createConnection()
+        val statement = connection.prepareStatement(query)
+        for (expense in expenses) {
+            statement.setString(1, expense.date.toString())
+            statement.setString(2, expense.description)
+            statement.setString(3, expense.category)
+            statement.setString(4, expense.paidBy)
+            statement.setDouble(5, expense.amount)
+            statement.setLong(6, expense.id)
+            statement.addBatch()
+        }
+        return statement.executeUpdate()
+    }
+
+    fun deleteExpenses(expenseIds: List<Long>): Int {
+        if (expenseIds.isEmpty()) {
+            return 0;
+        }
+        val query = """
+            DELETE FROM expenses 
+            WHERE id in ${expenseIds.joinToString(",", "(", ")")}
+        """.trimIndent()
+        val connection = createConnection()
+        val statement = connection.prepareStatement(query)
+        return statement.executeUpdate()
+    }
+
     fun fetchExpenses(startDateIncluding: Instant, endDateExcluding: Instant): List<Expense> {
+        // TODO add params
         val query = """
             SELECT ${getColumnNames().joinToString()} FROM expenses 
             ;
@@ -66,6 +103,31 @@ class Db() {
             }
         }
         return expenses
+    }
+
+    fun fetchSummary(
+        startDateIncluding: Instant,
+        endDateExcluding: Instant,
+        prevStartDateIncluding: Instant,
+        prevEndDateExcluding: Instant
+    ): SummaryData {
+        val expenses = fetchExpenses(startDateIncluding, endDateExcluding)
+        val prevExpenses = fetchExpenses(prevStartDateIncluding, prevEndDateExcluding)
+        val total = expenses.map { it.amount }.sum()
+        val previousTotal = prevExpenses.map { it.amount }.sum()
+        val totalByCategory = expenses.groupingBy { it.category }.aggregate { _, accumulator: Double?, element, _ ->
+            when (accumulator) {
+                null -> element.amount
+                else -> accumulator + element.amount
+            }
+        }
+        val totalByUser = expenses.groupingBy { it.paidBy }.aggregate { _, accumulator: Double?, element, _ ->
+            when (accumulator) {
+                null -> element.amount
+                else -> accumulator + element.amount
+            }
+        }
+        return SummaryData(total, previousTotal, totalByCategory, totalByUser)
     }
 
     private fun getColumnNames() = listOf("id", "date", "description", "category", "paid_by", "amount")

@@ -7,9 +7,9 @@ class ExpensesStore {
 
     @action getExpensesAsync = async () => {
         try {
-            let month = new Date().getMonth() + 1;
-            console.log(month)
-            const expensesList = await expenseService.get(month)
+            let today = new Date();
+            let startOfMonth =  new Date(today.getFullYear(), today.getMonth(), 1);
+            const expensesList = await expenseService.get(startOfMonth.toISOString(), today.toISOString())
             this.expenses = expensesList.map(expenseJson => new Expense(
                 expenseJson.id, expenseJson.date, expenseJson.description,
                 expenseJson.category, expenseJson.paidBy, expenseJson.amount)
@@ -22,6 +22,17 @@ class ExpensesStore {
     @action addNewExpense = async (id, date, description, category, paidBy, amount) => {
         const expense = new Expense(id, date, description, category, paidBy, amount)
         const data = await expenseService.post([expense])
+        this.getExpensesAsync()
+    }
+
+    @action updateExpense = async (id, date, description, category, paidBy, amount) => {
+        const expense = new Expense(id, date, description, category, paidBy, amount)
+        const data = await expenseService.put([expense])
+        this.getExpensesAsync()
+    }
+
+    @action deleteExpenses = async (ids) => {
+        const data = await expenseService.delete(ids)
         this.getExpensesAsync()
     }
 

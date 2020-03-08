@@ -5,12 +5,13 @@ import { inject, observer } from 'mobx-react'
 import ReactDataGrid from 'react-data-grid'
 
 const columns = [
+    { key: "actions", name: "Actions" },
     { key: "id", name: "ID" },
-    { key: "date", name: "Date", editable: true },
-    { key: "description", name: "Description", editable: true },
-    { key: "category", name: "Category", editable: true },
-    { key: "paidBy", name: "Paid By", editable: true },
-    { key: "amount", name: "Amount", editable: true}
+    { key: "date", name: "Date" },
+    { key: "description", name: "Description" },
+    { key: "category", name: "Category" },
+    { key: "paidBy", name: "Paid By" },
+    { key: "amount", name: "Amount"}
 ];
 
 @inject('ExpensesStore')
@@ -34,6 +35,27 @@ class DataGrid extends Component {
         }
     }
 
+    getCellActions = (column, row) => {
+        const cellActions = {
+          actions: [
+            {
+              icon: <span>edit</span>,
+              callback: () => {
+                  // TODO 
+                  this.props.ExpensesStore.updateExpense(row.id, row.date, row.description, row.category, row.paidBy, row.amount)
+              }
+            },
+            {
+              icon: <span>delete</span>,
+              callback: () => {
+                  this.props.ExpensesStore.deleteExpenses([row.id])
+              }
+            }
+          ]
+        };
+        return cellActions[column.key];
+    }
+
     render() {
         const { ExpensesStore } = this.props
         return <div className='data-grid'>
@@ -41,7 +63,7 @@ class DataGrid extends Component {
                 columns={columns}
                 rowGetter={i => this.createRow(ExpensesStore.expenses[i])}
                 rowsCount={ExpensesStore.getCount}
-                enableRowSelect={true}
+                getCellActions={this.getCellActions}
             />
         </div>
     }
