@@ -8,6 +8,6 @@ data class Summary (
 data class SummaryData (
     val total: Double,
     val previousTotal: Double,
-    val totalByCategory: Map<String, Double>,
-    val totalByUser: Map<String, Double>
+    val totalByCategory: Map<String, Double?>,
+    val totalByUser: Map<String, Double?>
 )

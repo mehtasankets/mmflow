@@ -2,10 +2,10 @@ import React from 'react'
 import { render } from 'react-dom'
 import App from './containers/App'
 import { Provider } from 'mobx-react'
-import ExpensesStore from './store/ExpensesStore'
+import ExpenseStore from './store/ExpenseStore'
 
 const Root = (
-    <Provider ExpensesStore={ExpensesStore}>
+    <Provider ExpenseStore={ExpenseStore}>
         <App />
     </Provider>
 )

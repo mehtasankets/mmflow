@@ -6,8 +6,9 @@ import Header from './Header'
 import Summary from './Summary'
 import ActionBar from './ActionBar'
 import DataGrid from './DataGrid'
+import ExpenseForm from './ExpenseForm'
 
-@inject('ExpensesStore')
+@inject('ExpenseStore')
 @observer
 class App extends Component {
 
@@ -17,6 +18,7 @@ class App extends Component {
             <Summary />
             <ActionBar />
             <DataGrid />
+            <ExpenseForm />
         </div>
     }
 }

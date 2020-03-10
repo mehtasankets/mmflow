@@ -3,6 +3,7 @@ import './DataGrid.css'
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import ReactDataGrid from 'react-data-grid'
+import Expense from '../store/Expense'
 
 const columns = [
     { key: "actions", name: "Actions" },
@@ -11,23 +12,23 @@ const columns = [
     { key: "description", name: "Description" },
     { key: "category", name: "Category" },
     { key: "paidBy", name: "Paid By" },
-    { key: "amount", name: "Amount"}
+    { key: "amount", name: "Amount" }
 ];
 
-@inject('ExpensesStore')
+@inject('ExpenseStore')
 @observer
 class DataGrid extends Component {
 
     componentDidMount() {
-        this.props.ExpensesStore.getExpensesAsync();
+        this.props.ExpenseStore.getExpenses();
     }
 
     createRow = (expense) => {
-        if (expense == undefined) 
+        if (expense == undefined)
             return {}
         return {
             "id": expense.id,
-            "date": expense.date.toLocaleDateString("en-US"),
+            "date": expense.date.toISOString(),
             "description": expense.description,
             "category": expense.category,
             "paidBy": expense.paidBy,
@@ -37,32 +38,34 @@ class DataGrid extends Component {
 
     getCellActions = (column, row) => {
         const cellActions = {
-          actions: [
-            {
-              icon: <span>edit</span>,
-              callback: () => {
-                  // TODO 
-                  this.props.ExpensesStore.updateExpense(row.id, row.date, row.description, row.category, row.paidBy, row.amount)
-              }
-            },
-            {
-              icon: <span>delete</span>,
-              callback: () => {
-                  this.props.ExpensesStore.deleteExpenses([row.id])
-              }
-            }
-          ]
+            actions: [
+                {
+                    icon: <span className="glyphicon glyphicon-pencil" />,
+                    callback: () => {
+                        console.log(row.amount)
+                        this.props.ExpenseStore.expense = new Expense(row.id, row.date, row.description, row.category, row.paidBy, row.amount)
+                        document.querySelector('.expense-form').style.display = 'block'
+                        document.querySelector('.description').focus()
+                    }
+                },
+                {
+                    icon: <span className="glyphicon glyphicon-trash" />,
+                    callback: () => {
+                        this.props.ExpenseStore.deleteExpenses([row.id])
+                    }
+                }
+            ]
         };
         return cellActions[column.key];
     }
 
     render() {
-        const { ExpensesStore } = this.props
+        const { ExpenseStore } = this.props
         return <div className='data-grid'>
             <ReactDataGrid
                 columns={columns}
-                rowGetter={i => this.createRow(ExpensesStore.expenses[i])}
-                rowsCount={ExpensesStore.getCount}
+                rowGetter={i => this.createRow(ExpenseStore.expenses[i])}
+                rowsCount={ExpenseStore.getCount}
                 getCellActions={this.getCellActions}
             />
         </div>

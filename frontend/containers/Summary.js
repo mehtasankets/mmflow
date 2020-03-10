@@ -3,12 +3,12 @@ import './Summary.css'
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 
-@inject('ExpensesStore')
+@inject('ExpenseStore')
 @observer
 class Summary extends Component {
 
     render() {
-        const { ExpensesStore } = this.props
+        const { ExpenseStore } = this.props
         return <div className='summary'>
             <div>Month to date expenditure</div>
             <div>Year to date expenditure</div>

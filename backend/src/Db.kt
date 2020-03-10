@@ -6,7 +6,7 @@ import java.sql.DriverManager
 import java.time.Instant
 
 
-class Db() {
+class Db {
     private var dbUrl: String
     private var objectMapper: ObjectMapper
 
@@ -64,7 +64,7 @@ class Db() {
 
     fun deleteExpenses(expenseIds: List<Long>): Int {
         if (expenseIds.isEmpty()) {
-            return 0;
+            return 0
         }
         val query = """
             DELETE FROM expenses 
@@ -121,10 +121,11 @@ class Db() {
                 else -> accumulator + element.amount
             }
         }
-        val totalByUser = expenses.groupingBy { it.paidBy }.aggregate { _, accumulator: Double?, element, _ ->
-            when (accumulator) {
-                null -> element.amount
-                else -> accumulator + element.amount
+        val totalByUser = expenses.groupingBy { it.paidBy }.aggregate { _, accumulator: Double?, element, first ->
+            if (first) {
+                element.amount
+            } else {
+                accumulator!! + element.amount
             }
         }
         return SummaryData(total, previousTotal, totalByCategory, totalByUser)
