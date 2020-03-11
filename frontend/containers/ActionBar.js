@@ -3,8 +3,7 @@ import 'flatpickr/dist/themes/material_green.css'
 
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
-import Flatpickr from 'react-flatpickr'
-import {RadioGroup, Radio} from 'react-radio-group'
+import {ButtonToolbar, Button} from 'react-bootstrap'
 
 @inject('ExpenseStore')
 @observer
@@ -19,8 +18,10 @@ class ActionBar extends Component {
     render() {
         const { ExpenseStore } = this.props
         return <div className='action-bar'>
-            <div id="new-expense" onClick={this.addNewExpenseButtonClick}>Add new expense</div>
-            <div id="delete-expenses">Delete expenses</div>
+            <ButtonToolbar>
+                <Button variant="primary" onClick={this.addNewExpenseButtonClick}>Add new expense</Button>
+                <Button variant="danger">Delete expense</Button>
+            </ButtonToolbar>
         </div>
     }
 }
