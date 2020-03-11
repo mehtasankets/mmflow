@@ -10,6 +10,9 @@ class ExpenseStore {
     // Expense being added / modified
     @observable expense = defaultExpense
 
+    // New / Update
+    @observable actionType = "New"
+
     @action getExpenses = async () => {
         let today = new Date();
         let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -24,6 +27,7 @@ class ExpenseStore {
         const data = await expenseService.post([this.expense])
         if (data == 1) {
             this.expense = defaultExpense
+            this.expenses = []
             this.getExpenses()
         }
     }
@@ -32,6 +36,7 @@ class ExpenseStore {
         const data = await expenseService.put([this.expense])
         if (data == 1) {
             this.expense = defaultExpense
+            this.expenses = []
             this.getExpenses()
         }
     }

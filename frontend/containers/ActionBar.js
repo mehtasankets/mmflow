@@ -11,6 +11,7 @@ import {RadioGroup, Radio} from 'react-radio-group'
 class ActionBar extends Component {
 
     addNewExpenseButtonClick = () => {
+        this.props.ExpenseStore.actionType = "New"
         document.querySelector('.expense-form').style.display = 'block'
         document.querySelector('.description').focus()
     }

@@ -42,8 +42,8 @@ class DataGrid extends Component {
                 {
                     icon: <span className="glyphicon glyphicon-pencil" />,
                     callback: () => {
-                        console.log(row.amount)
                         this.props.ExpenseStore.expense = new Expense(row.id, row.date, row.description, row.category, row.paidBy, row.amount)
+                        this.props.ExpenseStore.actionType = "Update"
                         document.querySelector('.expense-form').style.display = 'block'
                         document.querySelector('.description').focus()
                     }

@@ -13,8 +13,23 @@ class ExpenseForm extends Component {
 
     addNewExpense = (e) => {
         e.preventDefault()
-        this.props.ExpenseStore.expense = new Expense(-1, this.date, this.description, this.category, this.paidBy, this.amount)
-        this.props.ExpenseStore.addNewExpense()
+        if (this.date)
+            this.props.ExpenseStore.expense.date = this.date
+        if (this.description)
+            this.props.ExpenseStore.expense.description = this.description
+        if (this.category)
+            this.props.ExpenseStore.expense.category = this.category
+        if(this.paidBy)
+            this.props.ExpenseStore.expense.paidBy = this.paidBy
+        if(this.amount)
+            this.props.ExpenseStore.expense.amount = this.amount
+
+        if (this.props.ExpenseStore.actionType == "New") {
+            this.props.ExpenseStore.expense.id = -1
+            this.props.ExpenseStore.addNewExpense()
+        } else {
+            this.props.ExpenseStore.updateExpense()
+        }
         document.querySelector('.expense-form').style.display = 'none'
     }
 
