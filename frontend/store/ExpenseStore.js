@@ -9,9 +9,10 @@ class ExpenseStore {
     @observable expenses = []
     // Expense being added / modified
     @observable expense = defaultExpense
-
     // New / Update
     @observable actionType = "New"
+    // show / hide form
+    @observable showForm = false
 
     @action getExpenses = async () => {
         let today = new Date();

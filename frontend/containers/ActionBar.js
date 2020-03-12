@@ -11,8 +11,7 @@ class ActionBar extends Component {
 
     addNewExpenseButtonClick = () => {
         this.props.ExpenseStore.actionType = "New"
-        document.querySelector('.expense-form').style.display = 'block'
-        document.querySelector('.description').focus()
+        this.props.ExpenseStore.showForm = true
     }
 
     render() {

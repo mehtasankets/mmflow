@@ -44,8 +44,7 @@ class DataGrid extends Component {
                     callback: () => {
                         this.props.ExpenseStore.expense = new Expense(row.id, row.date, row.description, row.category, row.paidBy, row.amount)
                         this.props.ExpenseStore.actionType = "Update"
-                        document.querySelector('.expense-form').style.display = 'block'
-                        document.querySelector('.description').focus()
+                        this.props.ExpenseStore.showForm = true
                     }
                 },
                 {
