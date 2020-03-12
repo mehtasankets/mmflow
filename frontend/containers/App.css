@@ -1,6 +1,7 @@
 @media(min-width: 768px) {
   .app {
     max-width: calc(100% - 400px);
+    height: 100%;
     margin: 70px auto 10px auto;
   }
 }

@@ -20,7 +20,7 @@ class ActionBar extends Component {
         return <div className='action-bar'>
             <ButtonToolbar>
                 <Button variant="primary" onClick={this.addNewExpenseButtonClick}>Add new expense</Button>
-                <Button variant="danger">Delete expense</Button>
+                <Button variant="danger">Delete expenses</Button>
             </ButtonToolbar>
         </div>
     }
