@@ -11,33 +11,33 @@ class Summary extends Component {
     render() {
         const { ExpenseStore } = this.props
         return <div className='summary'>
-            <Row className="summary-row">
-                <Col className="summary-column" xs={6} md={3}>
-                    <Card className='tile tile-leftmost' bg={'success'}>
+            <Row className='summary-row'>
+                <Col className='summary-col' xs={6} md={3}>
+                    <Card bg={'info'}>
                         <Card.Header>Month to date expenditure</Card.Header>
                         <Card.Body>
                             <Card.Title>Number here</Card.Title>
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col className="summary-column" xs={6} md={3}>
-                    <Card className='tile tile-middle' bg={'success'}>
+                <Col className='summary-col' xs={6} md={3}>
+                    <Card bg={'info'}>
                         <Card.Header>Year to date expenditure</Card.Header>
                         <Card.Body>
                             <Card.Title>Number here</Card.Title>
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col className="summary-column" xs={6} md={3}>
-                    <Card className='tile tile-middle' bg={'success'}>
+                <Col className='summary-col' xs={6} md={3}>
+                    <Card bg={'info'}>
                         <Card.Header>Expenditure by category</Card.Header>
                         <Card.Body>
                             <Card.Title>Piechart here</Card.Title>
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col className="summary-column" xs={6} md={3}>
-                    <Card className='tile tile-rightmost' bg={'success'}>
+                <Col className='summary-col' xs={6} md={3}>
+                    <Card bg={'info'}>
                         <Card.Header>Last month expenditure</Card.Header>
                         <Card.Body>
                             <Card.Title>Number here</Card.Title>

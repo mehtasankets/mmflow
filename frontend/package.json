@@ -10,15 +10,16 @@
   "author": "mehtasankets (Sanket Mehta)",
   "license": "ISC",
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "flatpickr": "^4.6.2",
     "mobx": "^5.13.0",
     "mobx-react": "^6.1.3",
-    "react": "^16.9.0",
+    "react": "^16.13.0",
     "react-bootstrap": "^1.0.0-beta.17",
     "react-data-grid": "^6.0.0",
-    "react-dom": "^16.9.0",
+    "react-dom": "^16.13.0",
     "react-flatpickr": "^3.9.1",
-    "react-radio-group": "^3.0.3"
+    "react-icons": "^3.9.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

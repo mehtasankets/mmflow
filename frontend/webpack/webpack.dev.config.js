@@ -14,8 +14,14 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'babel-loader'
             },{
-                test: /\.less|\.css$/,
+                test: /\.css$/,
+                loaders: ["style-loader", "css-loader"]
+            },{
+                test: /\.less$/,
                 loaders: ["style-loader", "css-loader", "less-loader"]
+            },{
+                test: /\.s[ac]ss$/,
+                loader: ["style-loader", "css-loader", "sass-loader"]
             }
         ]
     },

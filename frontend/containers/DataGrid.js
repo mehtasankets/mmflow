@@ -4,15 +4,16 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import ReactDataGrid from 'react-data-grid'
 import Expense from '../store/Expense'
+import { FaRegTrashAlt, FaPencilAlt } from "react-icons/fa";
 
 const columns = [
-    { key: "actions", name: "Actions" },
-    { key: "id", name: "ID" },
-    { key: "date", name: "Date" },
-    { key: "description", name: "Description" },
-    { key: "category", name: "Category" },
-    { key: "paidBy", name: "Paid By" },
-    { key: "amount", name: "Amount" }
+    { key: "actions", name: "Actions", width: 100, resizable: true },
+    { key: "id", name: "ID", width: 70, resizable: true },
+    { key: "date", name: "Date", width: 220, resizable: true },
+    { key: "description", name: "Description", width: 220, resizable: true },
+    { key: "category", name: "Category", width: 180, resizable: true },
+    { key: "paidBy", name: "Paid By", width: 130, resizable: true },
+    { key: "amount", name: "Amount", width: 130, resizable: true }
 ];
 
 @inject('ExpenseStore')
@@ -40,7 +41,7 @@ class DataGrid extends Component {
         const cellActions = {
             actions: [
                 {
-                    icon: <span className="glyphicon glyphicon-pencil" />,
+                    icon: <FaPencilAlt />,
                     callback: () => {
                         this.props.ExpenseStore.expense = new Expense(row.id, row.date, row.description, row.category, row.paidBy, row.amount)
                         this.props.ExpenseStore.actionType = "Update"
@@ -48,7 +49,7 @@ class DataGrid extends Component {
                     }
                 },
                 {
-                    icon: <span className="glyphicon glyphicon-trash" />,
+                    icon: <FaRegTrashAlt />,
                     callback: () => {
                         this.props.ExpenseStore.deleteExpenses([row.id])
                     }
@@ -58,6 +59,17 @@ class DataGrid extends Component {
         return cellActions[column.key];
     }
 
+    onRowsSelected = rows => {
+        const selected = rows.map(r => r.row.id);
+        this.props.ExpenseStore.selectedExpenseIds.push(...selected)
+    };
+
+    onRowsDeselected = rows => {
+        const toRemove = rows.map(r => r.row.id)
+        this.props.ExpenseStore.selectedExpenseIds = this.props.ExpenseStore.selectedExpenseIds
+            .filter(x => toRemove.indexOf(x) < 0);
+    };
+
     render() {
         const { ExpenseStore } = this.props
         return <div className='data-grid'>
@@ -66,6 +78,17 @@ class DataGrid extends Component {
                 rowGetter={i => this.createRow(ExpenseStore.expenses[i])}
                 rowsCount={ExpenseStore.getCount}
                 getCellActions={this.getCellActions}
+                rowSelection={{
+                    showCheckbox: true,
+                    onRowsSelected: this.onRowsSelected,
+                    onRowsDeselected: this.onRowsDeselected,
+                    selectBy: {
+                      keys: {
+                          rowKey: "id",
+                          values: this.props.ExpenseStore.selectedExpenseIds
+                      }  
+                    }
+                }}
             />
         </div>
     }

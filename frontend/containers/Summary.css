@@ -3,26 +3,11 @@
 }
 
 .summary-row {
-  margin: 0% 0%;
+  margin-left: -5px;
+  margin-right: -5px;
 }
 
-.summary-column {
-  padding: 0% 0%;
-}
-
-.summary .tile {
-  height:100px;
-  padding: 2% 2%;
-}
-
-.summary .tile-leftmost {
-  margin-right: 1%;
-}
-
-.summary .tile-rightmost {
-  margin-left: 1%;
-}
-
-.summary .tile-middle {
-  margin: 0% 1%;
+.summary-col {
+  padding-left: 5px;
+  padding-right: 5px;
 }
