@@ -1,3 +1,8 @@
 .data-grid {
   margin: 1% 0%;
+  height: 500px;
+}
+
+.cell-action-icon {
+  margin-right: 12px;
 }
