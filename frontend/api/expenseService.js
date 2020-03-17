@@ -11,6 +11,14 @@ class ExpenseService {
         const response = await fetch(request);
         return response.json();
     }
+    fetchSummary = async () => {
+        const options = {
+            method: "GET",
+        }
+        const request = new Request(webApiUrl + `summary`, options);
+        const response = await fetch(request);
+        return response.json();
+    }
     post = async(expenses) => {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");

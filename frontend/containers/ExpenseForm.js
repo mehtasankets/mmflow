@@ -1,6 +1,3 @@
-import './ExpenseForm.css'
-import 'flatpickr/dist/themes/material_green.css'
-
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import Flatpickr from 'react-flatpickr'

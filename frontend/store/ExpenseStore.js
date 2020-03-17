@@ -1,8 +1,12 @@
 import { observable, action, computed } from 'mobx'
 import Expense from './Expense'
+import Summary from './Summary'
+import SummaryData from './SummaryData'
 import expenseService from '../api/expenseService'
 
 const defaultExpense = new Expense(-1, new Date().toISOString(), "", "Food", "Sanket", 0)
+
+const defaultSummary = new Summary(new SummaryData(), new SummaryData())
 
 class ExpenseStore {
     // List of expenses to be shown in the grid
@@ -15,6 +19,8 @@ class ExpenseStore {
     @observable showForm = false
     // Manage selected rows
     @observable selectedExpenseIds = []
+    // Summary
+    @observable summary = defaultSummary
 
     @action getExpenses = async () => {
         let today = new Date()
@@ -32,6 +38,7 @@ class ExpenseStore {
             this.expense = Object.assign({}, defaultExpense)
             this.expenses = []
             this.getExpenses()
+            this.fetchSummary()
         }
     }
 
@@ -41,6 +48,7 @@ class ExpenseStore {
             this.expense = Object.assign({}, defaultExpense)
             this.expenses = []
             this.getExpenses()
+            this.fetchSummary()
         }
     }
 
@@ -49,11 +57,12 @@ class ExpenseStore {
         if (data == ids.length) {
             this.expense = Object.assign({}, defaultExpense)
             this.getExpenses()
+            this.fetchSummary()
         }
     }
 
-    @computed get getCount() {
-        return this.expenses.length
+    @action fetchSummary = async () => {
+        this.summary = await expenseService.fetchSummary()
     }
 }
 

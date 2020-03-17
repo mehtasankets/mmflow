@@ -1,11 +1,6 @@
-import './DataGrid.css'
-import 'ag-grid-community/dist/styles/ag-grid.css'
-import 'ag-grid-community/dist/styles/ag-theme-balham.css'
-
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { AgGridReact } from 'ag-grid-react'
-import { Button } from 'react-bootstrap'
 import Expense from '../store/Expense'
 import { FaRegTrashAlt, FaPencilAlt } from "react-icons/fa"
 
@@ -16,11 +11,11 @@ class DataGrid extends Component {
     constructor(props) {
         super(props)
         this.defaultColDef = {
-            resizable: false, sortable: true, filter: true
+            resizable: true, sortable: true, filter: true
         }
         this.columns = [
             {
-                field: "actions", headerName: "Actions", sortable: false, filter: false, checkboxSelection: true, width: 100,
+                field: "actions", headerName: "Actions", sortable: false, filter: false, checkboxSelection: true,
                 cellRendererFramework: function (params) {
                     function updateExpense(params) {
                         const row = params.data
@@ -37,21 +32,26 @@ class DataGrid extends Component {
                     </div>
                 }
             },
-            { field: "id", headerName: "ID", width: 80 },
-            { 
-                field: "date", headerName: "Date", 
+            { field: "id", headerName: "ID" },
+            {
+                field: "date", headerName: "Date",
                 valueFormatter: function (params) {
                     return params.value.toISOString()
-              }, width: 300 },
-            { field: "description", headerName: "Description", width: 300 },
-            { field: "category", headerName: "Category", width: 200 },
-            { field: "paidBy", headerName: "Paid By", width: 200 },
-            { field: "amount", headerName: "Amount", width: 200 }
+                }
+            },
+            { field: "description", headerName: "Description" },
+            { field: "category", headerName: "Category" },
+            { field: "paidBy", headerName: "Paid By" },
+            { field: "amount", headerName: "Amount" }
         ];
     }
 
     componentDidMount() {
         this.props.ExpenseStore.getExpenses();
+    }
+
+    componentDidUpdate() {
+        this.gridApi.sizeColumnsToFit()
     }
 
     onSelectionChanged = () => {
@@ -61,13 +61,14 @@ class DataGrid extends Component {
     };
 
     onGridReady = (params) => {
-        params.api.sizeColumnsToFit()
+        this.gridApi = params.api
+        this.gridApi.sizeColumnsToFit()
     }
 
     render() {
         const { ExpenseStore } = this.props
-        return <div className='data-grid'>
-            <div className="ag-theme-balham" style={{height: 440}}>
+        return <div className='main-component data-grid'>
+            <div className="ag-theme-balham" style={{ height: 320 }}>
                 <AgGridReact
                     defaultColDef={this.defaultColDef}
                     columnDefs={this.columns}
@@ -75,6 +76,9 @@ class DataGrid extends Component {
                     rowSelection='multiple'
                     onSelectionChanged={this.onSelectionChanged}
                     onGridReady={this.onGridReady}
+                    gridOptions={{
+                        suppressHorizontalScroll: true
+                    }}
                 />
             </div>
         </div>

@@ -1,6 +1,3 @@
-import './ActionBar.css'
-import 'flatpickr/dist/themes/material_green.css'
-
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { ButtonToolbar, Button, Col } from 'react-bootstrap'
@@ -20,7 +17,7 @@ class ActionBar extends Component {
 
     render() {
         const { ExpenseStore } = this.props
-        return <div className='action-bar'>
+        return <div className='main-component action-bar'>
             <div className='action-row'>
                 <Button className='action-button' variant="primary" onClick={this.addNewExpense}>Add new expense</Button>
                 <Button className='action-button' variant="danger" onClick={this.deleteExpenses}>Delete expenses</Button>
