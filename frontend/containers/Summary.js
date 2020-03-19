@@ -38,9 +38,24 @@ class Summary extends Component {
             <Row className='summary-row'>
                 <Col className='summary-col' xs={12} md={4}>
                     <Card bg={'info'}>
-                        <Card.Header>Current month total expenditure</Card.Header>
+                        <Card.Header>Total expenditure</Card.Header>
                         <Card.Body>
-                            <Card.Title>{ExpenseStore.summary.monthToDateSummary.total}</Card.Title>
+                            <Row style={{ height: "20%" }}>
+                                <Col className="column-header center-align right-border">
+                                    Monthly
+                                    </Col>
+                                <Col className="column-header center-align">
+                                    Yearly
+                                </Col>
+                            </Row>
+                            <Row style={{ height: "80%" }}>
+                                <Col className="total-value center-align right-border">
+                                    {ExpenseStore.summary.monthToDateSummary.total}
+                                </Col>
+                                <Col className="total-value center-align">
+                                    {ExpenseStore.summary.yearToDateSummary.total}
+                                </Col>
+                            </Row>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -48,23 +63,55 @@ class Summary extends Component {
                     <Card bg={'info'}>
                         <Card.Header>Expenditure by category</Card.Header>
                         <Card.Body>
-                            <PieChart width={140} height={140}>
-                                <Pie
-                                    data={this.constructDataExpenditureByCategory(
-                                        ExpenseStore.summary.monthToDateSummary.totalByCategory
-                                    )}
-                                    labelLine={false}
-                                    label={renderCustomizedLabel}
-                                    outerRadius={68}
-                                    dataKey="value"
-                                >
-                                    {this.constructDataExpenditureByCategory(
-                                        ExpenseStore.summary.monthToDateSummary.totalByCategory
-                                    ).map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                            </PieChart>
+                            <Row style={{ height: "20%" }}>
+                                <Col className="column-header center-align right-border">
+                                    Monthly
+                                    </Col>
+                                <Col className="column-header center-align">
+                                    Yearly
+                                </Col>
+                            </Row>
+                            <Row style={{ height: "80%" }}>
+                                <Col className="center-align right-border">
+                                    <PieChart width={140} height={140}>
+                                        <Pie
+                                            data={this.constructDataExpenditureByCategory(
+                                                ExpenseStore.summary.monthToDateSummary.totalByCategory
+                                            )}
+                                            labelLine={false}
+                                            label={renderCustomizedLabel}
+                                            outerRadius={68}
+                                            dataKey="value"
+                                        >
+                                            {this.constructDataExpenditureByCategory(
+                                                ExpenseStore.summary.monthToDateSummary.totalByCategory
+                                            ).map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                    </PieChart>
+                                </Col>
+                                <Col className="center-align">
+                                    <PieChart width={140} height={140}>
+                                        <Pie
+                                            data={this.constructDataExpenditureByCategory(
+                                                ExpenseStore.summary.yearToDateSummary.totalByCategory
+                                            )}
+                                            labelLine={false}
+                                            label={renderCustomizedLabel}
+                                            outerRadius={68}
+                                            dataKey="value"
+                                        >
+                                            {this.constructDataExpenditureByCategory(
+                                                ExpenseStore.summary.yearToDateSummary.totalByCategory
+                                            ).map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                    </PieChart>
+                                </Col>
+                            </Row>
+
                         </Card.Body>
                     </Card>
                 </Col>
@@ -72,15 +119,39 @@ class Summary extends Component {
                     <Card bg={'info'}>
                         <Card.Header>Expenditure by user</Card.Header>
                         <Card.Body>
-                            <BarChart width={140} height={140} data={this.constructDataExpenditureByUser(
-                                ExpenseStore.summary.monthToDateSummary.totalByUser
-                            )}>
-                                <Bar dataKey='value' fill='#ffddbb'>
-                                    <LabelList dataKey="value" position="middle" />
-                                </Bar>
-                                <XAxis stroke='#eaf0f4' dataKey="name" />
-                                <Tooltip />
-                            </BarChart>
+                            <Row style={{ height: "20%" }}>
+                                <Col className="column-header center-align right-border">
+                                    Monthly
+                                    </Col>
+                                <Col className="column-header center-align">
+                                    Yearly
+                                </Col>
+                            </Row>
+                            <Row style={{ height: "80%" }}>
+                                <Col className="center-align right-border">
+                                    <BarChart width={140} height={140} data={this.constructDataExpenditureByUser(
+                                        ExpenseStore.summary.monthToDateSummary.totalByUser
+                                    )}>
+                                        <Bar dataKey='value' fill='#ffddbb'>
+                                            <LabelList dataKey="value" position="middle" />
+                                        </Bar>
+                                        <XAxis stroke='#eaf0f4' dataKey="name" />
+                                        <Tooltip />
+                                    </BarChart>
+                                </Col>
+                                <Col className="center-align">
+                                    <BarChart width={140} height={140} data={this.constructDataExpenditureByUser(
+                                        ExpenseStore.summary.yearToDateSummary.totalByUser
+                                    )}>
+                                        <Bar dataKey='value' fill='#ffddbb'>
+                                            <LabelList dataKey="value" position="middle" />
+                                        </Bar>
+                                        <XAxis stroke='#eaf0f4' dataKey="name" />
+                                        <Tooltip />
+                                    </BarChart>
+                                </Col>
+                            </Row>
+
                         </Card.Body>
                     </Card>
                 </Col>

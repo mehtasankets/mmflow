@@ -51,6 +51,29 @@ body {
   height: 100%;
 }
 
+.center-align {
+  display: flex;
+  justify-content: center;
+}
+
+.card .column-header {
+  font-size: large;
+}
+
+.card .total-value {
+  font-size: xx-large;
+}
+
+.summary .right-border {
+  border-right: 2px solid lightgray;
+}
+
+.summary .card-header {
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+}
+
 /* Action Bar */
 .action-row {
   margin-left: -5px;
