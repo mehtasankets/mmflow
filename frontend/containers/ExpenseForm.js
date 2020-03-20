@@ -49,7 +49,7 @@ class ExpenseForm extends Component {
                         <Col>
                             <Form.Group>
                                 <Flatpickr placeholder='enter date'
-                                    defaultValue={ExpenseStore.expense.date.toISOString()} onChange={value => this.date = value} />
+                                    defaultValue={ExpenseStore.expense.date.toISOString()} onChange={value => this.date = value[0]} />
                             </Form.Group>
                         </Col>
                         <Col>

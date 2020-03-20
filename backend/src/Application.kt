@@ -44,7 +44,7 @@ fun Application.module(testing: Boolean = false) {
             get {
                 val monthStart = Instant.now().atZone(ZoneId.systemDefault()).withDayOfMonth(1).toInstant()
                 val startDate = Instant.parse(call.parameters["startDate"] ?: monthStart.toString())
-                val endDate = Instant.parse(call.parameters["startDate"] ?: Instant.now().toString())
+                val endDate = Instant.parse(call.parameters["endDate"] ?: Instant.now().toString())
                 val expenses = db.fetchExpenses(startDate, endDate)
                 val serializedExpenses = objectMapper.writeValueAsString(expenses)
                 call.respondText(serializedExpenses, ContentType.Application.Json)

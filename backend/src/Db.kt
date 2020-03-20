@@ -3,6 +3,7 @@ package com.mehtasankets.mmflow
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import java.sql.DriverManager
+import java.sql.Timestamp
 import java.time.Instant
 
 
@@ -76,16 +77,16 @@ class Db {
     }
 
     fun fetchExpenses(startDateIncluding: Instant, endDateExcluding: Instant): List<Expense> {
-        // TODO add params
         val query = """
-            SELECT ${getColumnNames().joinToString()} FROM expenses 
+            SELECT ${getColumnNames().joinToString()} FROM expenses
+            WHERE date BETWEEN ? AND ?
             ;
         """.trimIndent()
         val expenses = mutableListOf<Expense>()
         createConnection().let { conn ->
             conn.prepareStatement(query).let { stmt ->
-                /*stmt.setTimestamp(1, Timestamp.from(startDateIncluding))
-                stmt.setTimestamp(2, Timestamp.from(endDateExcluding))*/
+                stmt.setString(1, startDateIncluding.toString())
+                stmt.setString(2, endDateExcluding.toString())
                 stmt.executeQuery().let { rs ->
                     while (rs.next()) {
                         expenses.add(
