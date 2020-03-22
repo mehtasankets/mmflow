@@ -68,7 +68,7 @@ class DataGrid extends Component {
     render() {
         const { ExpenseStore } = this.props
         return <div className='main-component data-grid'>
-            <div className="ag-theme-balham" style={{ height: 320 }}>
+            <div className="ag-theme-balham" style={{ height: 300 }}>
                 <AgGridReact
                     defaultColDef={this.defaultColDef}
                     columnDefs={this.columns}

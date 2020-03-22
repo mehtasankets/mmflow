@@ -36,7 +36,7 @@ class Summary extends Component {
         const { ExpenseStore } = this.props
         return <div className='main-component summary'>
             <Row className='summary-row'>
-                <Col className='summary-col' xs={12} md={4}>
+                <Col className='summary-col' lg={12} xl={4}>
                     <Card>
                         <Card.Header>Total expenditure</Card.Header>
                         <Card.Body>
@@ -59,7 +59,7 @@ class Summary extends Component {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col className='summary-col' xs={6} md={4}>
+                <Col className='summary-col' lg={12} xl={4}>
                     <Card>
                         <Card.Header>Expenditure by category</Card.Header>
                         <Card.Body>
@@ -117,7 +117,7 @@ class Summary extends Component {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col className='summary-col' xs={6} md={4}>
+                <Col className='summary-col' lg={12} xl={4}>
                     <Card>
                         <Card.Header>Expenditure by user</Card.Header>
                         <Card.Body>

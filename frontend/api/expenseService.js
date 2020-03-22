@@ -1,6 +1,6 @@
 import Expense from "../store/Expense";
 
-const webApiUrl = "http://localhost:8090/expense/";
+const webApiUrl = "http://192.168.1.22:8090/expense/";
 
 class ExpenseService {
     get = async (startDate, endDate) => {
