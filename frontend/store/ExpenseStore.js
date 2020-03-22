@@ -22,7 +22,7 @@ class ExpenseStore {
     // Summary
     @observable summary = defaultSummary
 
-    @action getExpenses = async () => {
+    @action getExpenses = async (expenseSheetName) => {
         let today = new Date()
         let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
         const expensesList = await expenseService.get(startOfMonth.toISOString(), today.toISOString())
@@ -32,7 +32,7 @@ class ExpenseStore {
         )
     };
 
-    @action addNewExpense = async () => {
+    @action addNewExpense = async (expenseSheetName) => {
         const data = await expenseService.post([this.expense])
         if (data == 1) {
             this.expense = Object.assign({}, defaultExpense)
@@ -42,7 +42,7 @@ class ExpenseStore {
         }
     }
 
-    @action updateExpense = async () => {
+    @action updateExpense = async (expenseSheetName) => {
         const data = await expenseService.put([this.expense])
         if (data == 1) {
             this.expense = Object.assign({}, defaultExpense)
@@ -52,7 +52,7 @@ class ExpenseStore {
         }
     }
 
-    @action deleteExpenses = async (ids) => {
+    @action deleteExpenses = async (expenseSheetName, ids) => {
         const data = await expenseService.delete(ids)
         if (data == ids.length) {
             this.expense = Object.assign({}, defaultExpense)
@@ -61,7 +61,7 @@ class ExpenseStore {
         }
     }
 
-    @action fetchSummary = async () => {
+    @action fetchSummary = async (expenseSheetName) => {
         this.summary = await expenseService.fetchSummary()
     }
 }

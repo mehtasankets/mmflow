@@ -2,14 +2,24 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import React from 'react'
 import { render } from 'react-dom'
-import App from './containers/App'
 import { Provider } from 'mobx-react'
+import { Route, Switch, BrowserRouter } from 'react-router-dom'
+import ProtectedRoute from './containers/ProtectedRoute'
+import Login from './containers/Login'
+import Welcome from './containers/Welcome'
+import Details from './containers/Details'
 import ExpenseStore from './store/ExpenseStore'
+import UserStore from './store/UserStore'
+import ExpenseSheetStore from './store/ExpenseSheetStore'
 
 const Root = (
-    <Provider ExpenseStore={ExpenseStore}>
-        <App />
-    </Provider>
+    <BrowserRouter>
+        <Provider ExpenseStore={ExpenseStore} UserStore={UserStore} ExpenseSheetStore={ExpenseSheetStore}>
+            <Route exact path="/mmflow/login" component={Login} />
+            <ProtectedRoute exact path="/mmflow/welcome" component={Welcome} />
+            <ProtectedRoute exact path="/mmflow/details" component={Details} />
+        </Provider>
+    </BrowserRouter>
 )
 
 render(Root, document.getElementById('root'))

@@ -1,4 +1,4 @@
-import './App.css'
+import './Details.css'
 import 'flatpickr/dist/themes/material_green.css'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-balham.css'
@@ -13,16 +13,16 @@ import ExpenseForm from './ExpenseForm'
 
 @inject('ExpenseStore')
 @observer
-class App extends Component {
+class Details extends Component {
 
     render() {
-        return <div className='app'>
-            <Header />
-            <Summary />
-            <ActionBar />
-            <DataGrid />
-            <ExpenseForm />
+        return <div className='details'>
+            <Header {...this.props} />
+            <Summary {...this.props} />
+            <ActionBar {...this.props} />
+            <DataGrid {...this.props} />
+            <ExpenseForm {...this.props} />
         </div>
     }
 }
-export default App
+export default Details

@@ -21,7 +21,8 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 class Summary extends Component {
 
     componentWillMount() {
-        this.props.ExpenseStore.fetchSummary()
+        const expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
+        this.props.ExpenseStore.fetchSummary(expenseSheetName)
     }
 
     constructDataExpenditureByCategory(data) {
@@ -135,7 +136,7 @@ class Summary extends Component {
                                         ExpenseStore.summary.monthToDateSummary.totalByUser
                                     )}>
                                         <Bar dataKey='value' fill='#663300'>
-                                            <LabelList dataKey="value" position="middle" fill="white" />
+                                            <LabelList dataKey="value" position="center" fill="white" />
                                         </Bar>
                                         <XAxis stroke='#555555' dataKey="name" />
                                         <Tooltip />
@@ -146,7 +147,7 @@ class Summary extends Component {
                                         ExpenseStore.summary.yearToDateSummary.totalByUser
                                     )}>
                                         <Bar dataKey='value' fill='#663300'>
-                                            <LabelList dataKey="value" position="middle" fill="white" />
+                                            <LabelList dataKey="value" position="center" fill="white" />
                                         </Bar>
                                         <XAxis stroke='#555555' dataKey="name" />
                                         <Tooltip />
