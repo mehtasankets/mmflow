@@ -62,16 +62,26 @@ body {
 
 .card .total-value {
   font-size: xx-large;
+  font-weight: bolder;
 }
 
 .summary .right-border {
-  border-right: 2px solid lightgray;
+  border-right: 2px solid #c41c1c;
 }
 
 .summary .card-header {
   font-weight: bold;
   font-size: 20px;
   text-align: center;
+  background-color: #d9d9b0;
+}
+
+.summary .card-body {
+  background-color: #faffd4;
+}
+
+.summary .pie-font {
+  font-size: x-small;
 }
 
 /* Action Bar */

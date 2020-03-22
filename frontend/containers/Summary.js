@@ -7,7 +7,7 @@ const COLORS = ["#663300", "#006633", "#330066", "#aaaa00", "#00aaaa", "#aa00aa"
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.7;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     return (
@@ -37,7 +37,7 @@ class Summary extends Component {
         return <div className='main-component summary'>
             <Row className='summary-row'>
                 <Col className='summary-col' xs={12} md={4}>
-                    <Card bg={'info'}>
+                    <Card>
                         <Card.Header>Total expenditure</Card.Header>
                         <Card.Body>
                             <Row style={{ height: "20%" }}>
@@ -60,7 +60,7 @@ class Summary extends Component {
                     </Card>
                 </Col>
                 <Col className='summary-col' xs={6} md={4}>
-                    <Card bg={'info'}>
+                    <Card>
                         <Card.Header>Expenditure by category</Card.Header>
                         <Card.Body>
                             <Row style={{ height: "20%" }}>
@@ -72,7 +72,7 @@ class Summary extends Component {
                                 </Col>
                             </Row>
                             <Row style={{ height: "80%" }}>
-                                <Col className="center-align right-border">
+                                <Col className="center-align right-border pie-font">
                                     <PieChart width={140} height={140}>
                                         <Pie
                                             data={this.constructDataExpenditureByCategory(
@@ -89,9 +89,10 @@ class Summary extends Component {
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
+                                        <Tooltip />
                                     </PieChart>
                                 </Col>
-                                <Col className="center-align">
+                                <Col className="center-align pie-font">
                                     <PieChart width={140} height={140}>
                                         <Pie
                                             data={this.constructDataExpenditureByCategory(
@@ -108,6 +109,7 @@ class Summary extends Component {
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
+                                        <Tooltip />
                                     </PieChart>
                                 </Col>
                             </Row>
@@ -116,7 +118,7 @@ class Summary extends Component {
                     </Card>
                 </Col>
                 <Col className='summary-col' xs={6} md={4}>
-                    <Card bg={'info'}>
+                    <Card>
                         <Card.Header>Expenditure by user</Card.Header>
                         <Card.Body>
                             <Row style={{ height: "20%" }}>
@@ -132,10 +134,10 @@ class Summary extends Component {
                                     <BarChart width={140} height={140} data={this.constructDataExpenditureByUser(
                                         ExpenseStore.summary.monthToDateSummary.totalByUser
                                     )}>
-                                        <Bar dataKey='value' fill='#ffddbb'>
-                                            <LabelList dataKey="value" position="middle" />
+                                        <Bar dataKey='value' fill='#663300'>
+                                            <LabelList dataKey="value" position="middle" fill="white" />
                                         </Bar>
-                                        <XAxis stroke='#eaf0f4' dataKey="name" />
+                                        <XAxis stroke='#555555' dataKey="name" />
                                         <Tooltip />
                                     </BarChart>
                                 </Col>
@@ -143,10 +145,10 @@ class Summary extends Component {
                                     <BarChart width={140} height={140} data={this.constructDataExpenditureByUser(
                                         ExpenseStore.summary.yearToDateSummary.totalByUser
                                     )}>
-                                        <Bar dataKey='value' fill='#ffddbb'>
-                                            <LabelList dataKey="value" position="middle" />
+                                        <Bar dataKey='value' fill='#663300'>
+                                            <LabelList dataKey="value" position="middle" fill="white" />
                                         </Bar>
-                                        <XAxis stroke='#eaf0f4' dataKey="name" />
+                                        <XAxis stroke='#555555' dataKey="name" />
                                         <Tooltip />
                                     </BarChart>
                                 </Col>
