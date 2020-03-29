@@ -16,13 +16,13 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
         </text>
     );
 };
-@inject('ExpenseStore')
+@inject('ExpenseStore', 'UserStore')
 @observer
 class Summary extends Component {
 
     componentWillMount() {
         const expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
-        this.props.ExpenseStore.fetchSummary(expenseSheetName)
+        this.props.ExpenseStore.fetchSummary(this.props.UserStore.user, expenseSheetName)
     }
 
     constructDataExpenditureByCategory(data) {

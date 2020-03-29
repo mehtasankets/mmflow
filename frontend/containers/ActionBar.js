@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { ButtonToolbar, Button, Col } from 'react-bootstrap'
 
-@inject('ExpenseStore')
+@inject('ExpenseStore', 'UserStore')
 @observer
 class ActionBar extends Component {
 
@@ -12,7 +12,9 @@ class ActionBar extends Component {
     }
 
     deleteExpenses = () => {
-        this.props.ExpenseStore.deleteExpenses(this.props.ExpenseStore.selectedExpenseIds)
+        let expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
+        this.props.ExpenseStore.deleteExpenses(this.props.UserStore.user, expenseSheetName, 
+            this.props.ExpenseStore.selectedExpenseIds)
     }
 
     render() {

@@ -3,11 +3,12 @@ import { inject, observer } from 'mobx-react'
 import Flatpickr from 'react-flatpickr'
 import { Modal, Form, Col, Button } from 'react-bootstrap'
 
-@inject('ExpenseStore')
+@inject('ExpenseStore', 'UserStore')
 @observer
 class ExpenseForm extends Component {
 
     addNewExpense = (e) => {
+        const expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
         e.preventDefault()
         if (this.date)
             this.props.ExpenseStore.expense.date = this.date
@@ -22,9 +23,9 @@ class ExpenseForm extends Component {
 
         if (this.props.ExpenseStore.actionType == "New") {
             this.props.ExpenseStore.expense.id = -1
-            this.props.ExpenseStore.addNewExpense()
+            this.props.ExpenseStore.addNewExpense(this.props.UserStore.user, expenseSheetName)
         } else {
-            this.props.ExpenseStore.updateExpense()
+            this.props.ExpenseStore.updateExpense(this.props.UserStore.user, expenseSheetName)
         }
         this.props.ExpenseStore.showForm = false
     }

@@ -4,15 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CORS
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.request.receiveText
+import io.ktor.request.uri
 import io.ktor.response.respondText
 import io.ktor.routing.*
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.header
+import io.ktor.sessions.sessions
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
@@ -32,7 +38,23 @@ fun Application.module(testing: Boolean = false) {
         method(HttpMethod.Put)
         method(HttpMethod.Post)
         header(HttpHeaders.ContentType)
+        header(Constants.USER_SESSION_HEADER)
+        exposeHeader(Constants.USER_SESSION_HEADER)
         anyHost()
+        allowCredentials = true
+    }
+
+    install(Sessions) {
+        header<UserSession>(Constants.USER_SESSION_HEADER)
+    }
+
+    intercept(ApplicationCallPipeline.Call) {
+        if (!call.request.uri.contains("/login")) {
+            val authenticationResult = AuthenticationUtil.authenticate(call)
+            if (!authenticationResult.first) {
+                call.respondText("Unauthenticated call", status = HttpStatusCode.Unauthorized)
+            }
+        }
     }
 
     val objectMapper = ObjectMapper().findAndRegisterModules()
@@ -41,6 +63,22 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
         route("/expense") {
+
+            post("/login") {
+                // Validate the token
+                val user = objectMapper.readValue<Map<String, String>>(call.receiveText())
+                val token = user["idToken"]
+                call.sessions.set(Constants.USER_SESSION_HEADER, UserSession(token ?: "unknown"))
+                call.respondText { "$token Logged in successfully." }
+            }
+
+            get("/logout") {
+                // Validate the token
+                val userSession = call.sessions.get(Constants.USER_SESSION_HEADER) as UserSession
+                call.sessions.clear(Constants.USER_SESSION_HEADER)
+                call.respondText { "${userSession.token} Logged out successfully." }
+            }
+
             get {
                 val monthStart = Instant.now().atZone(ZoneId.systemDefault()).withDayOfMonth(1).toInstant()
                 val startDate = Instant.parse(call.parameters["startDate"] ?: monthStart.toString())
@@ -97,4 +135,6 @@ fun Application.module(testing: Boolean = false) {
             }
         }
     }
+
+
 }

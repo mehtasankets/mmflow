@@ -2,34 +2,40 @@ import './Login.css'
 import React, { Component } from 'react'
 import { Form, Control, Button } from 'react-bootstrap'
 import { inject, observer } from 'mobx-react'
+import GoogleLogin from 'react-google-login';
 import Header from './Header'
+import User from '../store/User'
 
 @inject('UserStore')
 @observer
 class Login extends Component {
 
-    login = () => {
-        this.props.UserStore.login(this.password, () => {
+    login = (response) => {
+        const profile = response.getBasicProfile();
+        const idToken = response.getAuthResponse().id_token;
+        const displayName = profile.getName();
+        const imageUrl = profile.getImageUrl();
+        const user = new User("", idToken, displayName, imageUrl);
+        this.props.UserStore.login(user, () => {
             this.props.history.push("/mmflow/welcome")
         })
     }
 
-    triggerLogin = (e) => {
-        if (e.charCode == 13) {
-            this.login(e)
-        }
+    showException = (response) => {
+        Window.alert(response);
     }
 
     render() {
         return <div className='login'>
             <Header />
-            <div className='login-form'>
-                <Form.Group>
-                    <Form.Control type="password" placeholder="Enter password" autoFocus
-                        onChange={e => this.password = e.target.value} onKeyPress={this.triggerLogin} />
-                </Form.Group>
-                <Button variant="primary" onClick={this.login}>Login</Button>
-            </div>
+            <GoogleLogin
+                clientId="1034128931991-b5lgu67qod6vbsgilml6ir7iuaffqevk.apps.googleusercontent.com"
+                buttonText="Login"
+                onSuccess={this.login}
+                onFailure={this.showException}
+                cookiePolicy={'single_host_origin'}
+                isSignedIn={true}
+            />
         </div >
     }
 }

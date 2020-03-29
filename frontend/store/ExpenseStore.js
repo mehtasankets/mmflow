@@ -22,47 +22,47 @@ class ExpenseStore {
     // Summary
     @observable summary = defaultSummary
 
-    @action getExpenses = async (expenseSheetName) => {
+    @action getExpenses = async (user, expenseSheetName) => {
         let today = new Date()
         let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-        const expensesList = await expenseService.get(startOfMonth.toISOString(), today.toISOString())
+        const expensesList = await expenseService.get(user, startOfMonth.toISOString(), today.toISOString())
         this.expenses = expensesList.map(expenseJson => new Expense(
             expenseJson.id, expenseJson.date, expenseJson.description,
             expenseJson.category, expenseJson.paidBy, expenseJson.amount)
         )
     };
 
-    @action addNewExpense = async (expenseSheetName) => {
-        const data = await expenseService.post([this.expense])
+    @action addNewExpense = async (user, expenseSheetName) => {
+        const data = await expenseService.post(user, [this.expense])
         if (data == 1) {
             this.expense = Object.assign({}, defaultExpense)
             this.expenses = []
-            this.getExpenses()
-            this.fetchSummary()
+            this.getExpenses(user, expenseSheetName)
+            this.fetchSummary(user, expenseSheetName)
         }
     }
 
-    @action updateExpense = async (expenseSheetName) => {
-        const data = await expenseService.put([this.expense])
+    @action updateExpense = async (user, expenseSheetName) => {
+        const data = await expenseService.put(user, [this.expense])
         if (data == 1) {
             this.expense = Object.assign({}, defaultExpense)
             this.expenses = []
-            this.getExpenses()
-            this.fetchSummary()
+            this.getExpenses(user, expenseSheetName)
+            this.fetchSummary(user, expenseSheetName)
         }
     }
 
-    @action deleteExpenses = async (expenseSheetName, ids) => {
-        const data = await expenseService.delete(ids)
+    @action deleteExpenses = async (user, expenseSheetName, ids) => {
+        const data = await expenseService.delete(user, ids)
         if (data == ids.length) {
             this.expense = Object.assign({}, defaultExpense)
-            this.getExpenses()
-            this.fetchSummary()
+            this.getExpenses(user, expenseSheetName)
+            this.fetchSummary(user, expenseSheetName)
         }
     }
 
-    @action fetchSummary = async (expenseSheetName) => {
-        this.summary = await expenseService.fetchSummary()
+    @action fetchSummary = async (user, expenseSheetName) => {
+        this.summary = await expenseService.fetchSummary(user)
     }
 }
 

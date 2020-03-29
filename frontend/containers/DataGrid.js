@@ -4,12 +4,13 @@ import { AgGridReact } from 'ag-grid-react'
 import Expense from '../store/Expense'
 import { FaRegTrashAlt, FaPencilAlt } from "react-icons/fa"
 
-@inject('ExpenseStore')
+@inject('ExpenseStore', 'UserStore')
 @observer
 class DataGrid extends Component {
 
     constructor(props) {
         super(props)
+        this.expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
         this.defaultColDef = {
             resizable: true, sortable: true, filter: true
         }
@@ -24,7 +25,8 @@ class DataGrid extends Component {
                         props.ExpenseStore.showForm = true
                     }
                     function deleteExpense(params) {
-                        props.ExpenseStore.deleteExpenses([params.data.id])
+                        let expenseSheetName = new URLSearchParams(props.location.search).get("expenseSheetName");
+                        props.ExpenseStore.deleteExpenses(props.UserStore.user, expenseSheetName, [params.data.id]);
                     }
                     return <div>
                         <FaPencilAlt className='cell-action-icon' onClick={e => updateExpense(params)} />
@@ -47,7 +49,7 @@ class DataGrid extends Component {
     }
 
     componentDidMount() {
-        this.props.ExpenseStore.getExpenses();
+        this.props.ExpenseStore.getExpenses(this.props.UserStore.user, this.expenseSheetName);
     }
 
     componentDidUpdate() {

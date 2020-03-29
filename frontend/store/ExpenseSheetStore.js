@@ -5,7 +5,7 @@ class ExpenseSheetStore {
     // User expense sheets
     @observable expenseSheets = []
 
-    @action getExpenseSheets = (login) => {
+    @action getExpenseSheets = (user) => {
         this.expenseSheets = [
             new ExpenseSheet("test1", "Test sheet 1")]
     }

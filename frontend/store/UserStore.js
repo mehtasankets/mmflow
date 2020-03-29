@@ -2,7 +2,7 @@ import { observable, action, computed } from 'mobx'
 import User from './User'
 import authService from '../api/authService'
 
-const defaultUser = new User("unknown", "", "")
+const defaultUser = new User("", "unknown", "", "")
 
 class UserStore {
     // User info
@@ -10,10 +10,17 @@ class UserStore {
 
     @observable isAuthenticated = false
 
-    @action login = (password, callback) => {
-        this.user = authService.login(password)
-        this.isAuthenticated = this.user.login != 'unknown' 
-        callback()
+    @action login = async (user, callback) => {
+        try {
+            user.sessionId = await authService.login(user)
+            this.user = user
+            this.isAuthenticated = true
+            callback()
+        } catch (e) {
+            console.error("From userStore.login:", e)
+            this.user = null
+            this.isAuthenticated = false
+        }
     }
 
     @action logout = (callback) => {

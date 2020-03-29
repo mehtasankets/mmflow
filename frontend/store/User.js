@@ -1,12 +1,14 @@
 import { observable } from "mobx"
 
 export default class User {
-    @observable login
+    @observable sessionId
+    @observable idToken
     @observable displayName
     @observable profilePic
 
-    constructor(login, displayName, profilePic) {
-        this.login = login
+    constructor(sessionId, idToken, displayName, profilePic) {
+        this.sessionId = sessionId
+        this.idToken = idToken
         this.displayName = displayName
         this.profilePic = profilePic
     }

@@ -30,6 +30,7 @@ module.exports = {
         filename: 'bundle.js'
     },
     devServer: {
+        disableHostCheck: true,
         contentBase: parentDir,
         publicPath: '/mmflow/',
         historyApiFallback: true,
