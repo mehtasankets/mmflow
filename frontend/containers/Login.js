@@ -17,7 +17,11 @@ class Login extends Component {
         const imageUrl = profile.getImageUrl();
         const user = new User("", idToken, displayName, imageUrl);
         this.props.UserStore.login(user, () => {
-            this.props.history.push("/mmflow/welcome")
+            let destination = '/welcome'
+            if (this.props.location.state && this.props.location.state.from) {
+                destination = this.props.location.state.from
+            }
+            this.props.history.push(destination)
         })
     }
 

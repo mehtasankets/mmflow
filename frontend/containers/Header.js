@@ -10,7 +10,7 @@ class Header extends Component {
         const { UserStore } = this.props
         return <div className='header-bar'>
             <Navbar bg="dark" variant="dark" fixed='top'>
-                <Navbar.Brand href="/mmflow/welcome">
+                <Navbar.Brand href="/welcome">
                     <GiWallet size={2} className='logo' />{' '}Monthly money flow
                 </Navbar.Brand>
                 <Navbar.Collapse className="justify-content-end">

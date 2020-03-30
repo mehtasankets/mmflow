@@ -1,12 +1,16 @@
-package com.mehtasankets.mmflow
+package com.mehtasankets.mmflow.app
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCallPipeline
-import io.ktor.application.call
-import io.ktor.application.install
+import com.mehtasankets.mmflow.dao.Db
+import com.mehtasankets.mmflow.domain.Expense
+import com.mehtasankets.mmflow.domain.Summary
+import com.mehtasankets.mmflow.domain.UserSession
+import com.mehtasankets.mmflow.util.AuthenticationUtil
+import com.mehtasankets.mmflow.util.Constants
+import com.mehtasankets.mmflow.domain.User
+import io.ktor.application.*
 import io.ktor.features.CORS
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -22,6 +26,13 @@ import io.ktor.sessions.sessions
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
+import java.util.*
+
+
+val objectMapper = ObjectMapper().findAndRegisterModules()
+    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+val db = Db()
+val loggedInUsersCache = mutableMapOf<String, User>()
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -57,26 +68,32 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
-    val objectMapper = ObjectMapper().findAndRegisterModules()
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    val db = Db()
-
     routing {
         route("/expense") {
 
             post("/login") {
                 // Validate the token
-                val user = objectMapper.readValue<Map<String, String>>(call.receiveText())
-                val token = user["idToken"]
-                call.sessions.set(Constants.USER_SESSION_HEADER, UserSession(token ?: "unknown"))
-                call.respondText { "$token Logged in successfully." }
+                val user = objectMapper.readValue<User>(call.receiveText())
+                val sessionId = "${UUID.randomUUID()}-${System.currentTimeMillis()}"
+                user.sessionId = sessionId
+                loggedInUsersCache[sessionId] = user
+                call.sessions.set(Constants.USER_SESSION_HEADER, UserSession(sessionId))
+                call.respondText { "${user.displayName} Logged in successfully." }
             }
 
             get("/logout") {
                 // Validate the token
                 val userSession = call.sessions.get(Constants.USER_SESSION_HEADER) as UserSession
+                val user = loggedInUsersCache.remove(userSession.sessionId)
                 call.sessions.clear(Constants.USER_SESSION_HEADER)
-                call.respondText { "${userSession.token} Logged out successfully." }
+                call.respondText { "${user?.displayName} Logged out successfully." }
+            }
+
+            get("/expenseSheets") {
+                val user = getUser(call)
+                val expenseSheets = db.fetchExpenseSheets(user)
+                val serializedExpenseSheets = objectMapper.writeValueAsString(expenseSheets)
+                call.respondText(serializedExpenseSheets, ContentType.Application.Json)
             }
 
             get {
@@ -110,7 +127,8 @@ fun Application.module(testing: Boolean = false) {
 
                 val monthlySummaryData = db.fetchSummary(monthStart, monthEnd, prevMonthStart, prevMonthEnd)
                 val yearlySummaryData = db.fetchSummary(yearStart, yearEnd, prevYearStart, prevYearEnd)
-                val summary = Summary(monthlySummaryData, yearlySummaryData)
+                val summary =
+                    Summary(monthlySummaryData, yearlySummaryData)
 
                 val serializedSummary = objectMapper.writeValueAsString(summary)
                 call.respondText(serializedSummary, ContentType.Application.Json)
@@ -135,6 +153,9 @@ fun Application.module(testing: Boolean = false) {
             }
         }
     }
+}
 
-
+fun getUser(call: ApplicationCall): User {
+    val userSession = call.sessions.get(Constants.USER_SESSION_HEADER) as UserSession
+    return loggedInUsersCache[userSession.sessionId]!!
 }

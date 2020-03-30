@@ -1,9 +1,13 @@
-package com.mehtasankets.mmflow
+package com.mehtasankets.mmflow.dao
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.mehtasankets.mmflow.domain.Expense
+import domain.ExpenseSheet
+import com.mehtasankets.mmflow.domain.SummaryData
+import com.mehtasankets.mmflow.domain.User
+import com.mehtasankets.mmflow.domain.UserSession
 import java.sql.DriverManager
-import java.sql.Timestamp
 import java.time.Instant
 
 
@@ -19,6 +23,31 @@ class Db {
     }
 
     private fun createConnection() = DriverManager.getConnection(dbUrl)
+
+    fun fetchExpenseSheets(user: User): List<ExpenseSheet> {
+        val query = """
+            SELECT user_identity, name, description FROM expense_sheets
+            WHERE user_identity = ?;
+        """.trimIndent()
+        val expenseSheets = mutableListOf<ExpenseSheet>()
+        createConnection().let { conn ->
+            conn.prepareStatement(query).let { stmt ->
+                stmt.setString(1, user.identity)
+                stmt.executeQuery().let { rs ->
+                    while (rs.next()) {
+                        expenseSheets.add(
+                            ExpenseSheet(
+                                rs.getString("user_identity"),
+                                rs.getString("name"),
+                                rs.getString("description")
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        return expenseSheets
+    }
 
     fun insertExpenses(expenses: List<Expense>): Int {
         val query = """
@@ -78,7 +107,7 @@ class Db {
 
     fun fetchExpenses(startDateIncluding: Instant, endDateExcluding: Instant): List<Expense> {
         val query = """
-            SELECT ${getColumnNames().joinToString()} FROM expenses
+            SELECT ${getColumnNames().joinToString()} FROM expenses 
             WHERE date BETWEEN ? AND ?
             ;
         """.trimIndent()
@@ -129,7 +158,12 @@ class Db {
                 accumulator!! + element.amount
             }
         }
-        return SummaryData(total, previousTotal, totalByCategory, totalByUser)
+        return SummaryData(
+            total,
+            previousTotal,
+            totalByCategory,
+            totalByUser
+        )
     }
 
     private fun getColumnNames() = listOf("id", "date", "description", "category", "paid_by", "amount")

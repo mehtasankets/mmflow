@@ -32,7 +32,6 @@ module.exports = {
     devServer: {
         disableHostCheck: true,
         contentBase: parentDir,
-        publicPath: '/mmflow/',
         historyApiFallback: true,
         host: '0.0.0.0',
         port: 8080

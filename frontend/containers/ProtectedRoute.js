@@ -17,7 +17,7 @@ class ProtectedRoute extends Component {
                     } else {
                         return <Redirect to={
                             {
-                                pathname: "/mmflow/login",
+                                pathname: "/login",
                                 state: {
                                     from: props.location
                                 }

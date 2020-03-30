@@ -4,12 +4,12 @@ export default class User {
     @observable sessionId
     @observable idToken
     @observable displayName
-    @observable profilePic
+    @observable profilePicUrl
 
-    constructor(sessionId, idToken, displayName, profilePic) {
+    constructor(sessionId, idToken, displayName, profilePicUrl) {
         this.sessionId = sessionId
         this.idToken = idToken
         this.displayName = displayName
-        this.profilePic = profilePic
+        this.profilePicUrl = profilePicUrl
     }
 }

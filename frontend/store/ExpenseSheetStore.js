@@ -1,13 +1,16 @@
 import { observable, action } from 'mobx'
 import ExpenseSheet from './ExpenseSheet'
+import expenseService from '../api/expenseService'
 
 class ExpenseSheetStore {
     // User expense sheets
     @observable expenseSheets = []
 
-    @action getExpenseSheets = (user) => {
-        this.expenseSheets = [
-            new ExpenseSheet("test1", "Test sheet 1")]
+    @action getExpenseSheets = async (user) => {
+        const expenseSheetsList = await expenseService.fetchExpenseSheets(user)
+        this.expenseSheets = expenseSheetsList.map(sheetJson => new ExpenseSheet(
+            sheetJson.userIdentity, sheetJson.name, sheetJson.description
+        ))
     }
 }
 const expenseSheetStore = new ExpenseSheetStore()

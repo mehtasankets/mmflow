@@ -15,9 +15,9 @@ import ExpenseSheetStore from './store/ExpenseSheetStore'
 const Root = (
     <BrowserRouter>
         <Provider ExpenseStore={ExpenseStore} UserStore={UserStore} ExpenseSheetStore={ExpenseSheetStore}>
-            <Route exact path="/mmflow/login" component={Login} />
-            <ProtectedRoute exact path="/mmflow/welcome" component={Welcome} />
-            <ProtectedRoute exact path="/mmflow/details" component={Details} />
+            <Route exact path={["", "/", "/login"]} component={Login} />
+            <ProtectedRoute exact path="/welcome" component={Welcome} />
+            <ProtectedRoute exact path="/details" component={Details} />
         </Provider>
     </BrowserRouter>
 )

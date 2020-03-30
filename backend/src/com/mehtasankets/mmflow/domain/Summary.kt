@@ -1,4 +1,4 @@
-package com.mehtasankets.mmflow
+package com.mehtasankets.mmflow.domain
 
 data class Summary (
     val monthToDateSummary: SummaryData,

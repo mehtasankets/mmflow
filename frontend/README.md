@@ -2,16 +2,37 @@
 
 To manage Monthly Money Flow
 
-# To setup
-install nodejs, npm:
+## One time setup instructions
+
+### Install nginx:
+```
+Follow instructions from http://nginx.org/en/docs/windows.html
+```
+
+### Configure nginx.conf:
+vim `server` block in <nginx-folder>/conf/nginx.conf
+```
+listen 80;
+server_name mmflow.mehtasanket-dev.in; # Change it to your domain
+location / {
+  proxy_pass "http://127.0.0.1:8080"
+}
+```
+
+### Install nodejs, npm:
 ```
 curl -sL https://deb.nodesource.com/setup_6.x | sudo bash -
 sudo apt-get install -y nodejs
 sudo apt-get install -y npm
 ```
-install packages:
+
+### Install packages:
 `npm install`
 
-# To run
-`npm run dev`
-Access the site at http://localhost:8080/
+## Run instructions
+```
+(Windows cmd nginx folder) start nginx
+(From project folder) npm run dev
+```
+
+Access the site at http://mmflow.mehtasanket-dev.in/

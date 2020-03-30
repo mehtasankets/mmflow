@@ -2,6 +2,18 @@ const webApiUrl = "http://192.168.1.22:8090/expense/"
 const userSessionHeader = "X-User-Session"
 
 class ExpenseService {
+    fetchExpenseSheets = async (user) => {
+        const headers = new Headers();
+        headers.append(userSessionHeader, user.sessionId);
+        const options = {
+            credentials: "include",
+            method: "GET",
+            headers
+        }
+        const request = new Request(webApiUrl + `expenseSheets`, options);
+        const response = await fetch(request);
+        return response.json();
+    }
     get = async (user, startDate, endDate) => {
         const headers = new Headers();
         headers.append(userSessionHeader, user.sessionId);

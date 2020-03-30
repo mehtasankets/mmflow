@@ -10,11 +10,11 @@ class Welcome extends Component {
 
     componentWillMount() {
         const { UserStore, ExpenseSheetStore } = this.props
-        ExpenseSheetStore.getExpenseSheets(UserStore.user.login)
+        ExpenseSheetStore.getExpenseSheets(UserStore.user)
     }
 
     redirect = (expenseSheetName) => {
-        this.props.history.push("/mmflow/details?expenseSheetName=" + expenseSheetName)
+        this.props.history.push("/details?expenseSheetName=" + expenseSheetName)
     }
 
     render() {
