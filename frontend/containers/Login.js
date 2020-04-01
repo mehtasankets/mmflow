@@ -2,7 +2,7 @@ import './Login.css'
 import React, { Component } from 'react'
 import { Form, Control, Button } from 'react-bootstrap'
 import { inject, observer } from 'mobx-react'
-import GoogleLogin from 'react-google-login';
+import GoogleLogin from 'react-google-login'
 import Header from './Header'
 import User from '../store/User'
 
@@ -11,11 +11,11 @@ import User from '../store/User'
 class Login extends Component {
 
     login = (response) => {
-        const profile = response.getBasicProfile();
-        const idToken = response.getAuthResponse().id_token;
-        const displayName = profile.getName();
-        const imageUrl = profile.getImageUrl();
-        const user = new User("", idToken, displayName, imageUrl);
+        const profile = response.getBasicProfile()
+        const idToken = response.getAuthResponse().id_token
+        const displayName = profile.getName()
+        const imageUrl = profile.getImageUrl()
+        const user = new User("", idToken, displayName, imageUrl)
         this.props.UserStore.login(user, () => {
             let destination = '/welcome'
             if (this.props.location.state && this.props.location.state.from) {
@@ -26,7 +26,7 @@ class Login extends Component {
     }
 
     showException = (response) => {
-        Window.alert(response);
+        Window.alert(response)
     }
 
     render() {

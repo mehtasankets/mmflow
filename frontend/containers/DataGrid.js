@@ -19,15 +19,15 @@ class DataGrid extends Component {
                 field: "actions", headerName: "Actions", sortable: false, filter: false, checkboxSelection: true,
                 cellRendererFramework: function (params) {
                     function updateExpense(params) {
-                        let expenseSheetName = new URLSearchParams(props.location.search).get("expenseSheetName");
+                        let expenseSheetName = new URLSearchParams(props.location.search).get("expenseSheetName")
                         const row = params.data
                         props.ExpenseStore.expense = new Expense(expenseSheetName, row.id, row.date, row.description, row.category, row.paidBy, row.amount)
                         props.ExpenseStore.actionType = "Update"
                         props.ExpenseStore.showForm = true
                     }
                     function deleteExpense(params) {
-                        let expenseSheetName = new URLSearchParams(props.location.search).get("expenseSheetName");
-                        props.ExpenseStore.deleteExpenses(props.UserStore.user, expenseSheetName, [params.data.id]);
+                        let expenseSheetName = new URLSearchParams(props.location.search).get("expenseSheetName")
+                        props.ExpenseStore.deleteExpenses(props.UserStore.user, expenseSheetName, [params.data.id])
                     }
                     return <div>
                         <FaPencilAlt className='cell-action-icon' onClick={e => updateExpense(params)} />
@@ -46,11 +46,11 @@ class DataGrid extends Component {
             { field: "category", headerName: "Category" },
             { field: "paidBy", headerName: "Paid By" },
             { field: "amount", headerName: "Amount" }
-        ];
+        ]
     }
 
     componentDidMount() {
-        this.props.ExpenseStore.getExpenses(this.props.UserStore.user, this.expenseSheetName);
+        this.props.ExpenseStore.getExpenses(this.props.UserStore.user, this.expenseSheetName)
     }
 
     componentDidUpdate() {
@@ -61,7 +61,7 @@ class DataGrid extends Component {
         const selectedNodes = this.gridApi.getSelectedNodes()
         const selectedIds = selectedNodes.map(node => node.data.id)
         this.props.ExpenseStore.selectedExpenseIds = selectedIds
-    };
+    }
 
     onGridReady = (params) => {
         this.gridApi = params.api

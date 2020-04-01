@@ -1,21 +1,21 @@
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { Container, Row, Col, Card } from 'react-bootstrap'
-import { BarChart, Bar, XAxis, LabelList, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, LabelList, Tooltip, PieChart, Pie, Cell } from 'recharts'
 
-const COLORS = ["#663300", "#006633", "#330066", "#aaaa00", "#00aaaa", "#aa00aa", "#ff0000", "#00ff00", "#0000ff"];
+const COLORS = ["#663300", "#006633", "#330066", "#aaaa00", "#00aaaa", "#aa00aa", "#ff0000", "#00ff00", "#0000ff"]
 
-const RADIAN = Math.PI / 180;
+const RADIAN = Math.PI / 180
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.7;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.7
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
     return (
         <text x={x} y={y} fill="white" textAnchor={x > cx ? "start" : "end"} dominantBaseline="central">
             {`${(percent * 100).toFixed(0)}%`}
         </text>
-    );
-};
+    )
+}
 @inject('ExpenseStore', 'UserStore')
 @observer
 class Summary extends Component {

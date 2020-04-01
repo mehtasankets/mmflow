@@ -30,7 +30,7 @@ class ExpenseStore {
             expenseJson.expenseSheetName, expenseJson.id, expenseJson.date, expenseJson.description,
             expenseJson.category, expenseJson.paidBy, expenseJson.amount)
         )
-    };
+    }
 
     @action addNewExpense = async (user, expenseSheetName) => {
         const data = await expenseService.post(user, expenseSheetName, [this.expense])
