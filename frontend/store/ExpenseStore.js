@@ -2,11 +2,11 @@ import { observable, action, computed } from 'mobx'
 import Expense from './Expense'
 import Summary from './Summary'
 import SummaryData from './SummaryData'
-import expenseService from '../api/expenseService'
+import expenseService from '../api/ExpenseService'
 
-const defaultExpense = new Expense(-1, new Date().toISOString(), "", "Food", "Sanket", 0)
+const defaultExpense = new Expense("", -1, new Date().toISOString(), "", "Food", "Sanket", 0)
 
-const defaultSummary = new Summary(new SummaryData(), new SummaryData())
+const defaultSummary = new Summary("", new SummaryData(), new SummaryData())
 
 class ExpenseStore {
     // List of expenses to be shown in the grid
@@ -25,15 +25,15 @@ class ExpenseStore {
     @action getExpenses = async (user, expenseSheetName) => {
         let today = new Date()
         let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-        const expensesList = await expenseService.get(user, startOfMonth.toISOString(), today.toISOString())
+        const expensesList = await expenseService.get(user, expenseSheetName, startOfMonth.toISOString(), today.toISOString())
         this.expenses = expensesList.map(expenseJson => new Expense(
-            expenseJson.id, expenseJson.date, expenseJson.description,
+            expenseJson.expenseSheetName, expenseJson.id, expenseJson.date, expenseJson.description,
             expenseJson.category, expenseJson.paidBy, expenseJson.amount)
         )
     };
 
     @action addNewExpense = async (user, expenseSheetName) => {
-        const data = await expenseService.post(user, [this.expense])
+        const data = await expenseService.post(user, expenseSheetName, [this.expense])
         if (data == 1) {
             this.expense = Object.assign({}, defaultExpense)
             this.expenses = []
@@ -43,7 +43,7 @@ class ExpenseStore {
     }
 
     @action updateExpense = async (user, expenseSheetName) => {
-        const data = await expenseService.put(user, [this.expense])
+        const data = await expenseService.put(user, expenseSheetName, [this.expense])
         if (data == 1) {
             this.expense = Object.assign({}, defaultExpense)
             this.expenses = []
@@ -53,7 +53,7 @@ class ExpenseStore {
     }
 
     @action deleteExpenses = async (user, expenseSheetName, ids) => {
-        const data = await expenseService.delete(user, ids)
+        const data = await expenseService.delete(user, expenseSheetName, ids)
         if (data == ids.length) {
             this.expense = Object.assign({}, defaultExpense)
             this.getExpenses(user, expenseSheetName)
@@ -62,7 +62,7 @@ class ExpenseStore {
     }
 
     @action fetchSummary = async (user, expenseSheetName) => {
-        this.summary = await expenseService.fetchSummary(user)
+        this.summary = await expenseService.fetchSummary(user, expenseSheetName)
     }
 }
 

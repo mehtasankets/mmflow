@@ -3,10 +3,9 @@ package com.mehtasankets.mmflow.dao
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.mehtasankets.mmflow.domain.Expense
-import domain.ExpenseSheet
 import com.mehtasankets.mmflow.domain.SummaryData
 import com.mehtasankets.mmflow.domain.User
-import com.mehtasankets.mmflow.domain.UserSession
+import domain.ExpenseSheet
 import java.sql.DriverManager
 import java.time.Instant
 
@@ -57,11 +56,12 @@ class Db {
         val connection = createConnection()
         val statement = connection.prepareStatement(query)
         for (expense in expenses) {
-            statement.setString(1, expense.date.toString())
-            statement.setString(2, expense.description)
-            statement.setString(3, expense.category)
-            statement.setString(4, expense.paidBy)
-            statement.setDouble(5, expense.amount)
+            statement.setString(1, expense.expenseSheetName)
+            statement.setString(2, expense.date.toString())
+            statement.setString(3, expense.description)
+            statement.setString(4, expense.category)
+            statement.setString(5, expense.paidBy)
+            statement.setDouble(6, expense.amount)
             statement.addBatch()
         }
         return statement.executeUpdate()
@@ -77,6 +77,7 @@ class Db {
                 paid_by = ?,
                 amount = ?
             WHERE id = ?
+            AND expense_sheet_name = ?
         """.trimIndent()
         val connection = createConnection()
         val statement = connection.prepareStatement(query)
@@ -87,28 +88,32 @@ class Db {
             statement.setString(4, expense.paidBy)
             statement.setDouble(5, expense.amount)
             statement.setLong(6, expense.id)
+            statement.setString(7, expense.expenseSheetName)
             statement.addBatch()
         }
         return statement.executeUpdate()
     }
 
-    fun deleteExpenses(expenseIds: List<Long>): Int {
+    fun deleteExpenses(expenseSheetName: String, expenseIds: List<Long>): Int {
         if (expenseIds.isEmpty()) {
             return 0
         }
         val query = """
             DELETE FROM expenses 
             WHERE id in ${expenseIds.joinToString(",", "(", ")")}
+            AND expense_sheet_name = ?
         """.trimIndent()
         val connection = createConnection()
         val statement = connection.prepareStatement(query)
+        statement.setString(1, expenseSheetName)
         return statement.executeUpdate()
     }
 
-    fun fetchExpenses(startDateIncluding: Instant, endDateExcluding: Instant): List<Expense> {
+    fun fetchExpenses(expenseSheetName: String, startDateIncluding: Instant, endDateExcluding: Instant): List<Expense> {
         val query = """
             SELECT ${getColumnNames().joinToString()} FROM expenses 
             WHERE date BETWEEN ? AND ?
+            AND expense_sheet_name = ?
             ;
         """.trimIndent()
         val expenses = mutableListOf<Expense>()
@@ -116,16 +121,19 @@ class Db {
             conn.prepareStatement(query).let { stmt ->
                 stmt.setString(1, startDateIncluding.toString())
                 stmt.setString(2, endDateExcluding.toString())
+                stmt.setString(3, expenseSheetName)
                 stmt.executeQuery().let { rs ->
                     while (rs.next()) {
                         expenses.add(
                             Expense(
+                                rs.getString("expense_sheet_name"),
                                 rs.getLong("id"),
                                 Instant.parse(rs.getString("date")),
                                 rs.getString("description"),
                                 rs.getString("category"),
                                 rs.getString("paid_by"),
                                 rs.getDouble("amount")
+
                             )
                         )
                     }
@@ -136,13 +144,14 @@ class Db {
     }
 
     fun fetchSummary(
+        expenseSheetName: String,
         startDateIncluding: Instant,
         endDateExcluding: Instant,
         prevStartDateIncluding: Instant,
         prevEndDateExcluding: Instant
     ): SummaryData {
-        val expenses = fetchExpenses(startDateIncluding, endDateExcluding)
-        val prevExpenses = fetchExpenses(prevStartDateIncluding, prevEndDateExcluding)
+        val expenses = fetchExpenses(expenseSheetName, startDateIncluding, endDateExcluding)
+        val prevExpenses = fetchExpenses(expenseSheetName, prevStartDateIncluding, prevEndDateExcluding)
         val total = expenses.map { it.amount }.sum()
         val previousTotal = prevExpenses.map { it.amount }.sum()
         val totalByCategory = expenses.groupingBy { it.category }.aggregate { _, accumulator: Double?, element, _ ->
@@ -166,5 +175,6 @@ class Db {
         )
     }
 
-    private fun getColumnNames() = listOf("id", "date", "description", "category", "paid_by", "amount")
+    private fun getColumnNames() =
+        listOf("expense_sheet_name", "id", "date", "description", "category", "paid_by", "amount")
 }

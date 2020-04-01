@@ -1,6 +1,7 @@
 import { observable } from "mobx"
 
 export default class Expense {
+    @observable expenseSheetName
     @observable id
     @observable date
     @observable description
@@ -8,7 +9,8 @@ export default class Expense {
     @observable paidBy
     @observable amount
 
-    constructor(id, dateStr, description, category, paidBy, amount) {
+    constructor(expenseSheetName, id, dateStr, description, category, paidBy, amount) {
+        this.expenseSheetName = expenseSheetName
         if (!id) {
             id = -1
         }

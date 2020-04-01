@@ -1,6 +1,6 @@
 import { observable, action } from 'mobx'
 import ExpenseSheet from './ExpenseSheet'
-import expenseService from '../api/expenseService'
+import expenseService from '../api/ExpenseService'
 
 class ExpenseSheetStore {
     // User expense sheets

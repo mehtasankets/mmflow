@@ -1,6 +1,6 @@
 import { observable, action, computed } from 'mobx'
 import User from './User'
-import authService from '../api/authService'
+import authService from '../api/AuthService'
 
 const defaultUser = new User("", "unknown", "", "")
 

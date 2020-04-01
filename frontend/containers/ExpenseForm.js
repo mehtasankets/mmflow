@@ -10,6 +10,7 @@ class ExpenseForm extends Component {
     addNewExpense = (e) => {
         const expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
         e.preventDefault()
+        this.props.ExpenseStore.expense.expenseSheetName = expenseSheetName
         if (this.date)
             this.props.ExpenseStore.expense.date = this.date
         if (this.description)

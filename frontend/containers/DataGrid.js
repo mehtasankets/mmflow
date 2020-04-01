@@ -19,8 +19,9 @@ class DataGrid extends Component {
                 field: "actions", headerName: "Actions", sortable: false, filter: false, checkboxSelection: true,
                 cellRendererFramework: function (params) {
                     function updateExpense(params) {
+                        let expenseSheetName = new URLSearchParams(props.location.search).get("expenseSheetName");
                         const row = params.data
-                        props.ExpenseStore.expense = new Expense(row.id, row.date, row.description, row.category, row.paidBy, row.amount)
+                        props.ExpenseStore.expense = new Expense(expenseSheetName, row.id, row.date, row.description, row.category, row.paidBy, row.amount)
                         props.ExpenseStore.actionType = "Update"
                         props.ExpenseStore.showForm = true
                     }

@@ -6,10 +6,10 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.mehtasankets.mmflow.dao.Db
 import com.mehtasankets.mmflow.domain.Expense
 import com.mehtasankets.mmflow.domain.Summary
+import com.mehtasankets.mmflow.domain.User
 import com.mehtasankets.mmflow.domain.UserSession
 import com.mehtasankets.mmflow.util.AuthenticationUtil
 import com.mehtasankets.mmflow.util.Constants
-import com.mehtasankets.mmflow.domain.User
 import io.ktor.application.*
 import io.ktor.features.CORS
 import io.ktor.http.ContentType
@@ -76,6 +76,8 @@ fun Application.module(testing: Boolean = false) {
                 val user = objectMapper.readValue<User>(call.receiveText())
                 val sessionId = "${UUID.randomUUID()}-${System.currentTimeMillis()}"
                 user.sessionId = sessionId
+                // TODO: Change later with google.sub
+                user.identity = "103061349669344984576"
                 loggedInUsersCache[sessionId] = user
                 call.sessions.set(Constants.USER_SESSION_HEADER, UserSession(sessionId))
                 call.respondText { "${user.displayName} Logged in successfully." }
@@ -97,15 +99,17 @@ fun Application.module(testing: Boolean = false) {
             }
 
             get {
+                val expenseSheetName = call.parameters["expenseSheetName"] ?: ""
                 val monthStart = Instant.now().atZone(ZoneId.systemDefault()).withDayOfMonth(1).toInstant()
                 val startDate = Instant.parse(call.parameters["startDate"] ?: monthStart.toString())
                 val endDate = Instant.parse(call.parameters["endDate"] ?: Instant.now().toString())
-                val expenses = db.fetchExpenses(startDate, endDate)
+                val expenses = db.fetchExpenses(expenseSheetName, startDate, endDate)
                 val serializedExpenses = objectMapper.writeValueAsString(expenses)
                 call.respondText(serializedExpenses, ContentType.Application.Json)
             }
 
             get("/summary") {
+                val expenseSheetName = call.parameters["expenseSheetName"] ?: ""
                 val monthStart = Instant.now().atZone(ZoneId.systemDefault()).withDayOfMonth(1).toInstant()
                 val monthEnd =
                     Instant.now().atZone(ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfMonth()).toInstant()
@@ -125,8 +129,10 @@ fun Application.module(testing: Boolean = false) {
                     yearEnd.atZone(ZoneId.systemDefault()).minusYears(1).with(TemporalAdjusters.lastDayOfMonth())
                         .toInstant()
 
-                val monthlySummaryData = db.fetchSummary(monthStart, monthEnd, prevMonthStart, prevMonthEnd)
-                val yearlySummaryData = db.fetchSummary(yearStart, yearEnd, prevYearStart, prevYearEnd)
+                val monthlySummaryData =
+                    db.fetchSummary(expenseSheetName, monthStart, monthEnd, prevMonthStart, prevMonthEnd)
+                val yearlySummaryData =
+                    db.fetchSummary(expenseSheetName, yearStart, yearEnd, prevYearStart, prevYearEnd)
                 val summary =
                     Summary(monthlySummaryData, yearlySummaryData)
 
@@ -147,8 +153,10 @@ fun Application.module(testing: Boolean = false) {
             }
 
             delete {
-                val expenseIds = objectMapper.readValue<List<Long>>(call.receiveText())
-                val count = db.deleteExpenses(expenseIds)
+                val data = objectMapper.readValue<Map<String, Any>>(call.receiveText())
+                val expenseSheetName = data["expenseSheetName"] as String
+                val expenseIds = data["expenseIds"] as List<Long>
+                val count = db.deleteExpenses(expenseSheetName, expenseIds)
                 call.respondText(count.toString(), ContentType.Application.Json)
             }
         }
