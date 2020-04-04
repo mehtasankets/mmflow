@@ -53,8 +53,8 @@ class ExpenseStore {
     }
 
     @action deleteExpenses = async (user, expenseSheetName, ids) => {
-        const data = await expenseService.delete(user, expenseSheetName, ids)
-        if (data == ids.length) {
+        const count = await expenseService.delete(user, expenseSheetName, ids)
+        if (count > 0) {
             this.expense = Object.assign({}, defaultExpense)
             this.getExpenses(user, expenseSheetName)
             this.fetchSummary(user, expenseSheetName)

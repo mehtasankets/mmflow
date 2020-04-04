@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.mehtasankets.mmflow.dao.Db
-import com.mehtasankets.mmflow.domain.Expense
-import com.mehtasankets.mmflow.domain.Summary
-import com.mehtasankets.mmflow.domain.User
-import com.mehtasankets.mmflow.domain.UserSession
+import com.mehtasankets.mmflow.domain.*
 import com.mehtasankets.mmflow.util.AuthenticationUtil
 import com.mehtasankets.mmflow.util.Constants
 import io.ktor.application.*
@@ -91,10 +88,12 @@ fun Application.module(testing: Boolean = false) {
                 call.respondText { "${user?.displayName} Logged out successfully." }
             }
 
-            get("/expenseSheets") {
+            get("/expenseSheet") {
                 val user = getUser(call)
                 val expenseSheets = db.fetchExpenseSheets(user)
-                val serializedExpenseSheets = objectMapper.writeValueAsString(expenseSheets)
+                val filteredSheets =
+                    expenseSheets.filter { it.name != user.identity && !it.sharedWith.contains(user.identity) }
+                val serializedExpenseSheets = objectMapper.writeValueAsString(filteredSheets)
                 call.respondText(serializedExpenseSheets, ContentType.Application.Json)
             }
 
@@ -140,6 +139,12 @@ fun Application.module(testing: Boolean = false) {
                 call.respondText(serializedSummary, ContentType.Application.Json)
             }
 
+            post("/expenseSheet") {
+                val expenseSheets = objectMapper.readValue<List<ExpenseSheet>>(call.receiveText())
+                val count = db.insertExpenseSheets(expenseSheets)
+                call.respondText(count.toString(), ContentType.Application.Json)
+            }
+
             post {
                 val expenses = objectMapper.readValue<List<Expense>>(call.receiveText())
                 val count = db.insertExpenses(expenses)
@@ -149,6 +154,20 @@ fun Application.module(testing: Boolean = false) {
             put {
                 val expenses = objectMapper.readValue<List<Expense>>(call.receiveText())
                 val count = db.updateExpenses(expenses)
+                call.respondText(count.toString(), ContentType.Application.Json)
+            }
+
+            put("/expenseSheet/share") {
+                val data = objectMapper.readValue<List<Pair<String, String>>>(call.receiveText())
+                val count = db.shareExpenseSheets(data)
+                call.respondText(count.toString(), ContentType.Application.Json)
+            }
+
+            delete("/expenseSheet") {
+                val user = getUser(call)
+                val data = objectMapper.readValue<Map<String, Any>>(call.receiveText())
+                val expenseSheetNames = data["expenseSheetNames"] as List<String>
+                val count = db.deleteExpenseSheets(expenseSheetNames)
                 call.respondText(count.toString(), ContentType.Application.Json)
             }
 

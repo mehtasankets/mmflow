@@ -37,6 +37,11 @@ body {
   margin-right: 10px;
 }
 
+.profile-pic {
+  height: 40px;
+  margin-right: 10px;
+}
+
 /* Summary */
 .main-component {
   margin: 15px 0 0 0;

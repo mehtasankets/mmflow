@@ -10,10 +10,56 @@ class ExpenseService {
             method: "GET",
             headers
         }
-        const request = new Request(webApiUrl + `expenseSheets`, options)
+        const request = new Request(webApiUrl + `expenseSheet`, options)
         const response = await fetch(request)
         return response.json()
     }
+
+    createExpenseSheets = async (user, expenseSheets) => {
+        const headers = new Headers()
+        headers.append(userSessionHeader, user.sessionId)
+        headers.append("Content-Type", "application/json")
+        var options = {
+            credentials: "include",
+            method: "POST",
+            headers,
+            body: JSON.stringify(expenseSheets)
+        }
+        const request = new Request(webApiUrl + `expenseSheet`, options)
+        const response = await fetch(request)
+        return response.json()
+    }
+
+    shareExpenseSheets = async (user, sharingDetails) => {
+        const headers = new Headers()
+        headers.append(userSessionHeader, user.sessionId)
+        headers.append("Content-Type", "application/json")
+        var options = {
+            credentials: "include",
+            method: "PUT",
+            headers,
+            body: JSON.stringify(sharingDetails)
+        }
+        const request = new Request(webApiUrl + `expenseSheet`, options)
+        const response = await fetch(request)
+        return response.json()
+    }
+
+    deleteExpenseSheets = async (user, expenseSheetNames) => {
+        const headers = new Headers()
+        headers.append(userSessionHeader, user.sessionId)
+        headers.append("Content-Type", "application/json")
+        var options = {
+            credentials: "include",
+            method: "DELETE",
+            headers,
+            body: JSON.stringify(expenseSheetNames)
+        }
+        const request = new Request(webApiUrl + `expenseSheet`, options)
+        const response = await fetch(request)
+        return response.json()
+    }
+
     get = async (user, expenseSheetName, startDate, endDate) => {
         const headers = new Headers()
         headers.append(userSessionHeader, user.sessionId)

@@ -13,3 +13,12 @@
 .welcome-col {
   padding: 5px 5px;
 }
+
+.create-new-sheet-div {
+  border: dashed;
+  background: #f7f7f7;
+  height: 100%;
+  text-align: center;
+  font-weight: 500;
+  padding: 10% 0px;
+}

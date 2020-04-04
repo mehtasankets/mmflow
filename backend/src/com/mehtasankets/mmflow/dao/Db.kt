@@ -3,9 +3,9 @@ package com.mehtasankets.mmflow.dao
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.mehtasankets.mmflow.domain.Expense
+import com.mehtasankets.mmflow.domain.ExpenseSheet
 import com.mehtasankets.mmflow.domain.SummaryData
 import com.mehtasankets.mmflow.domain.User
-import domain.ExpenseSheet
 import java.sql.DriverManager
 import java.time.Instant
 
@@ -25,20 +25,22 @@ class Db {
 
     fun fetchExpenseSheets(user: User): List<ExpenseSheet> {
         val query = """
-            SELECT user_identity, name, description FROM expense_sheets
-            WHERE user_identity = ?;
+            SELECT user_identity, name, description, shared_with FROM expense_sheets
+            WHERE user_identity = ? OR shared_with like ?;
         """.trimIndent()
         val expenseSheets = mutableListOf<ExpenseSheet>()
         createConnection().let { conn ->
             conn.prepareStatement(query).let { stmt ->
                 stmt.setString(1, user.identity)
+                stmt.setString(2, "%${user.identity}%")
                 stmt.executeQuery().let { rs ->
                     while (rs.next()) {
                         expenseSheets.add(
                             ExpenseSheet(
                                 rs.getString("user_identity"),
                                 rs.getString("name"),
-                                rs.getString("description")
+                                rs.getString("description"),
+                                rs.getString("shared_with")?.split("###")?.toMutableList() ?: mutableListOf<String>()
                             )
                         )
                     }
@@ -46,6 +48,23 @@ class Db {
             }
         }
         return expenseSheets
+    }
+
+    fun insertExpenseSheets(expenseSheets: List<ExpenseSheet>): Int {
+        val query = """
+            INSERT INTO expense_sheets (user_identity, name, description, shared_with)
+            VALUES (?, ?, ?, ?)
+        """.trimIndent()
+        val connection = createConnection()
+        val statement = connection.prepareStatement(query)
+        for (expenseSheet in expenseSheets) {
+            statement.setString(1, expenseSheet.userIdentity)
+            statement.setString(2, expenseSheet.name)
+            statement.setString(3, expenseSheet.description)
+            statement.setString(4, expenseSheet.sharedWith.joinToString { "###" })
+            statement.addBatch()
+        }
+        return statement.executeUpdate()
     }
 
     fun insertExpenses(expenses: List<Expense>): Int {
@@ -91,6 +110,19 @@ class Db {
             statement.setString(7, expense.expenseSheetName)
             statement.addBatch()
         }
+        return statement.executeUpdate()
+    }
+
+    fun deleteExpenseSheets(expenseSheetNames: List<String>): Int {
+        if (expenseSheetNames.isEmpty()) {
+            return 0
+        }
+        val query = """
+            DELETE FROM expense_sheets 
+            WHERE name in ${expenseSheetNames.joinToString(",", "(", ")")}
+        """.trimIndent()
+        val connection = createConnection()
+        val statement = connection.prepareStatement(query)
         return statement.executeUpdate()
     }
 
@@ -173,6 +205,57 @@ class Db {
             totalByCategory,
             totalByUser
         )
+    }
+
+    fun shareExpenseSheets(data: List<Pair<String, String>>): Int {
+        val expenseSheets = fetchExpenseSheetsByNames(data.map { it.first })
+        val expenseSheetsMap = expenseSheets.associateBy { it.name }
+        val enrichedSheets = data.filter { expenseSheetsMap.containsKey(it.first) }.map {
+            val expenseSheet = expenseSheetsMap.getValue(it.first)
+            if (!expenseSheet.sharedWith.contains(it.second)) {
+                expenseSheet.sharedWith.add(it.second)
+            }
+            expenseSheet
+        }
+
+        val query = """
+            UPDATE expense_sheets 
+            SET shared_with = ?
+            WHERE name = ?
+        """.trimIndent()
+        val connection = createConnection()
+        val statement = connection.prepareStatement(query)
+        for (expenseSheet in enrichedSheets) {
+            statement.setString(1, expenseSheet.sharedWith.joinToString { "###" })
+            statement.setString(2, expenseSheet.name)
+            statement.addBatch()
+        }
+        return statement.executeUpdate()
+    }
+
+    private fun fetchExpenseSheetsByNames(names: List<String>): List<ExpenseSheet> {
+        val query = """
+            SELECT user_identity, name, description FROM expense_sheets
+            WHERE name in ${names.joinToString(",", "(", ")")};
+        """.trimIndent()
+        val expenseSheets = mutableListOf<ExpenseSheet>()
+        createConnection().let { conn ->
+            conn.prepareStatement(query).let { stmt ->
+                stmt.executeQuery().let { rs ->
+                    while (rs.next()) {
+                        expenseSheets.add(
+                            ExpenseSheet(
+                                rs.getString("user_identity"),
+                                rs.getString("name"),
+                                rs.getString("description"),
+                                rs.getString("shared_with").split("###").toMutableList()
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        return expenseSheets
     }
 
     private fun getColumnNames() =

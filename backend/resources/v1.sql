@@ -1,6 +1,6 @@
 CREATE TABLE expense_sheets (
     user_identity TEXT NOT NULL,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL PRIMARY KEY,
     description TEXT NOT NULL,
     shared_with TEXT
 );
