@@ -17,6 +17,8 @@ class ExpenseStore {
     @observable actionType = "New"
     // show / hide form
     @observable showForm = false
+    // show / hide deletion confirmation
+    @observable showDeletionConfirmationDialog = false
     // Manage selected rows
     @observable selectedExpenseIds = []
     // Summary
@@ -56,6 +58,7 @@ class ExpenseStore {
         const count = await expenseService.delete(user, expenseSheetName, ids)
         if (count > 0) {
             this.expense = Object.assign({}, defaultExpense)
+            this.showDeletionConfirmationDialog = false
             this.getExpenses(user, expenseSheetName)
             this.fetchSummary(user, expenseSheetName)
         }

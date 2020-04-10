@@ -113,13 +113,14 @@ class Db {
         return statement.executeUpdate()
     }
 
-    fun deleteExpenseSheets(expenseSheetNames: List<String>): Int {
+    fun deleteExpenseSheets(user: User, expenseSheetNames: List<String>): Int {
         if (expenseSheetNames.isEmpty()) {
             return 0
         }
         val query = """
             DELETE FROM expense_sheets 
-            WHERE name in ${expenseSheetNames.joinToString(",", "(", ")")}
+            WHERE name in ${expenseSheetNames.joinToString("','", "('", "')")}
+            AND user_identity = '${user.identity}'
         """.trimIndent()
         val connection = createConnection()
         val statement = connection.prepareStatement(query)
@@ -234,9 +235,11 @@ class Db {
     }
 
     private fun fetchExpenseSheetsByNames(names: List<String>): List<ExpenseSheet> {
+        if(names.isEmpty())
+            return listOf()
         val query = """
             SELECT user_identity, name, description FROM expense_sheets
-            WHERE name in ${names.joinToString(",", "(", ")")};
+            WHERE name in ${names.joinToString("','", "('", "')")};
         """.trimIndent()
         val expenseSheets = mutableListOf<ExpenseSheet>()
         createConnection().let { conn ->

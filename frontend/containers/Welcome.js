@@ -1,9 +1,10 @@
 import './Welcome.css'
 import React, { Component } from 'react'
-import { Row, Col, Card, Button } from 'react-bootstrap'
+import { Row, Col, Card, Button, Form, Modal } from 'react-bootstrap'
 import { inject, observer } from 'mobx-react'
 import { FaTrashAlt } from 'react-icons/fa'
 import Header from './Header'
+import ConfirmationModal from './ConfirmationModal'
 import ExpenseSheet from './../store/ExpenseSheet'
 
 @inject('UserStore', 'ExpenseSheetStore')
@@ -20,17 +21,16 @@ class Welcome extends Component {
     }
 
     delete = (expenseSheetName) => {
-        alert("TODO: delete from here")
-        // this.props.ExpenseSheetStore.delete(this.props.UserStore.user, [expenseSheetName])
+        this.props.ExpenseSheetStore.delete(this.props.UserStore.user, [expenseSheetName])
     }
 
-    create = (name, description) => {
-        alert("TODO: create from here")
-        // const expenseSheet = new ExpenseSheet(null, name, description, null)
-        // this.props.ExpenseSheetStore.create(this.props.UserStore.user, [expenseSheet])
+    createNewSheet = () => {
+        const expenseSheet = new ExpenseSheet(null, this.name, this.description, [])
+        this.props.ExpenseSheetStore.create(this.props.UserStore.user, [expenseSheet])
     }
 
     render() {
+        const { ExpenseSheetStore } = this.props
         return <div className='welcome'>
             <Header />
             <Row className='welcome-row'>
@@ -44,7 +44,10 @@ class Welcome extends Component {
                                             {expenseSheet.name}
                                         </Col>
                                         <Col xl={2} >
-                                            <FaTrashAlt className='delete-sheet' style={{cursor:'pointer'}} onClick={() => this.delete(expenseSheet.name)} size={25} />
+                                            <FaTrashAlt className='delete-sheet' style={{ cursor: 'pointer' }} onClick={() => {
+                                                this.sheetToBeDeleted = expenseSheet.name
+                                                ExpenseSheetStore.showDeletionConfirmationDialog = true
+                                            }} size={25} />
                                         </Col>
                                     </Row>
                                 </Card.Header>
@@ -52,23 +55,46 @@ class Welcome extends Component {
                                     <Card.Text>
                                         {expenseSheet.description}
                                     </Card.Text>
-                                    <Button variant="primary" style={{cursor:'pointer'}} onClick={() => this.redirect(expenseSheet.name)}>Open Sheet</Button>{' '}
+                                    <Button variant="primary" style={{ cursor: 'pointer' }} onClick={() => this.redirect(expenseSheet.name)}>Open Sheet</Button>{' '}
                                     <Button variant="success">Share</Button>
                                 </Card.Body>
                             </Card>
                         </Col>
                     ))
                 }
-                <Col className='welcome-col' style={{cursor:'pointer'}} onClick={() => this.create("test", "foo")} lg={6} xl={4}>
+                <Col className='welcome-col' style={{ cursor: 'pointer' }} onClick={() => ExpenseSheetStore.showCreateForm = true} lg={6} xl={4}>
                     <Card border="primary" className="create-new-sheet-div">
                         <blockquote className="blockquote mb-0 card-body">
-                            <p>
-                                Create new sheet
-                            </p>
+                            Create new expense sheet
                         </blockquote>
                     </Card>
                 </Col>
             </Row>
+            <Modal show={ExpenseSheetStore.showCreateForm} onHide={() => ExpenseSheetStore.showCreateForm = false} animation={false} size="m">
+                <Modal.Header closeButton>
+                    <Modal.Title>New expense sheet form</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Control type="text" placeholder="Enter name" autoFocus onChange={e => this.name = e.target.value} />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control type="text" placeholder="Enter description" onChange={e => this.description = e.target.value} />
+                        </Form.Group>
+                        <Form.Group>
+                            <Button variant="primary" onClick={this.createNewSheet}>Create new sheet</Button>{' '}
+                            <Button variant="secondary" onClick={() => ExpenseSheetStore.showCreateForm = false}>Cancel</Button>
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+            <ConfirmationModal 
+                show={ExpenseSheetStore.showDeletionConfirmationDialog} 
+                title="Delete Expense Sheet" 
+                question={`Do you really want to delete '${this.sheetToBeDeleted}' expense sheet?`}
+                onConfirmation={() => this.delete(this.sheetToBeDeleted)}
+                onCancellation={() => ExpenseSheetStore.showDeletionConfirmationDialog = false}/>
         </div>
     }
 }

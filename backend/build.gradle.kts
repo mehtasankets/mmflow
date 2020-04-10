@@ -35,6 +35,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.10.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.3")
     implementation( "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.3")
+    implementation("com.google.api-client:google-api-client:1.30.9")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 }
 

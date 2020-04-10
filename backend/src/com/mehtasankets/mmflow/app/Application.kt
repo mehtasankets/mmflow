@@ -3,6 +3,10 @@ package com.mehtasankets.mmflow.app
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.jackson2.JacksonFactory
 import com.mehtasankets.mmflow.dao.Db
 import com.mehtasankets.mmflow.domain.*
 import com.mehtasankets.mmflow.util.AuthenticationUtil
@@ -24,12 +28,18 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 import java.util.*
+import kotlin.math.exp
 
 
-val objectMapper = ObjectMapper().findAndRegisterModules()
+val objectMapper: ObjectMapper = ObjectMapper().findAndRegisterModules()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 val db = Db()
 val loggedInUsersCache = mutableMapOf<String, User>()
+var verifier: GoogleIdTokenVerifier =
+    GoogleIdTokenVerifier.Builder(NetHttpTransport(), JacksonFactory.getDefaultInstance())
+        .setAudience(listOf("1034128931991-b5lgu67qod6vbsgilml6ir7iuaffqevk.apps.googleusercontent.com"))
+        .build()
+
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -69,12 +79,14 @@ fun Application.module(testing: Boolean = false) {
         route("/expense") {
 
             post("/login") {
-                // Validate the token
-                val user = objectMapper.readValue<User>(call.receiveText())
                 val sessionId = "${UUID.randomUUID()}-${System.currentTimeMillis()}"
+                val user = objectMapper.readValue<User>(call.receiveText())
+                val idToken: GoogleIdToken = verifier.verify(user.idToken)
+                if (idToken == null) {
+                    call.respondText("User is not authenticated", status = HttpStatusCode.Unauthorized)
+                }
+                user.identity = idToken.payload.subject
                 user.sessionId = sessionId
-                // TODO: Change later with google.sub
-                user.identity = "103061349669344984576"
                 loggedInUsersCache[sessionId] = user
                 call.sessions.set(Constants.USER_SESSION_HEADER, UserSession(sessionId))
                 call.respondText { "${user.displayName} Logged in successfully." }
@@ -140,7 +152,9 @@ fun Application.module(testing: Boolean = false) {
             }
 
             post("/expenseSheet") {
+                val user = getUser(call)
                 val expenseSheets = objectMapper.readValue<List<ExpenseSheet>>(call.receiveText())
+                expenseSheets.map { it.userIdentity = user.identity }
                 val count = db.insertExpenseSheets(expenseSheets)
                 call.respondText(count.toString(), ContentType.Application.Json)
             }
@@ -165,9 +179,8 @@ fun Application.module(testing: Boolean = false) {
 
             delete("/expenseSheet") {
                 val user = getUser(call)
-                val data = objectMapper.readValue<Map<String, Any>>(call.receiveText())
-                val expenseSheetNames = data["expenseSheetNames"] as List<String>
-                val count = db.deleteExpenseSheets(expenseSheetNames)
+                val data = objectMapper.readValue<List<String>>(call.receiveText())
+                val count = db.deleteExpenseSheets(user, data)
                 call.respondText(count.toString(), ContentType.Application.Json)
             }
 

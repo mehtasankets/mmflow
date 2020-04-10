@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { AgGridReact } from 'ag-grid-react'
 import Expense from '../store/Expense'
+import ConfirmationModal from './ConfirmationModal'
 import { FaRegTrashAlt, FaPencilAlt } from "react-icons/fa"
 
 @inject('ExpenseStore', 'UserStore')
@@ -27,12 +28,13 @@ class DataGrid extends Component {
                     }
                     function deleteExpense(params) {
                         let expenseSheetName = new URLSearchParams(props.location.search).get("expenseSheetName")
-                        props.ExpenseStore.deleteExpenses(props.UserStore.user, expenseSheetName, [params.data.id])
+                        props.ExpenseStore.selectedExpenseIds = params.data.id
+                        props.ExpenseStore.showDeletionConfirmationDialog = true
                     }
                     return <div>
-                        <FaPencilAlt className='cell-action-icon' onClick={e => updateExpense(params)} />
-                        <FaRegTrashAlt className='cell-action-icon' onClick={e => deleteExpense(params)} />
-                    </div>
+                        <FaPencilAlt style={{ cursor: 'pointer' }} className='cell-action-icon' onClick={e => updateExpense(params)} />
+                        <FaRegTrashAlt style={{ cursor: 'pointer' }} className='cell-action-icon' onClick={e => deleteExpense(params)} />
+                    </div >
                 }
             },
             { field: "id", headerName: "ID" },
@@ -69,7 +71,7 @@ class DataGrid extends Component {
     }
 
     render() {
-        const { ExpenseStore } = this.props
+        const { ExpenseStore, UserStore } = this.props
         return <div className='main-component data-grid'>
             <div className="ag-theme-balham" style={{ height: 300 }}>
                 <AgGridReact
@@ -84,6 +86,12 @@ class DataGrid extends Component {
                     }}
                 />
             </div>
+            < ConfirmationModal
+                show={ExpenseStore.showDeletionConfirmationDialog}
+                title="Delete Expense"
+                question={`Do you really want to delete selected expense?`}
+                onConfirmation={() => ExpenseStore.deleteExpenses(UserStore.user, this.expenseSheetName, ExpenseStore.selectedExpenseIds)}
+                onCancellation={() => ExpenseStore.showDeletionConfirmationDialog = false} />
         </div>
     }
 }
