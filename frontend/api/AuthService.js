@@ -17,7 +17,7 @@ class AuthService {
         return response.headers.get('X-User-Session')
     }
 
-    logout = async (uesr) => {
+    logout = async (user) => {
         const headers = new Headers()
         headers.append(userSessionHeader, user.sessionId)
         var options = {

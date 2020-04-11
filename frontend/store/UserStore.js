@@ -23,9 +23,10 @@ class UserStore {
         }
     }
 
-    @action logout = (callback) => {
-        authService.logout()
+    @action logout = async (callback) => {
+        await authService.logout(this.user)
         this.isAuthenticated = false
+        this.user = defaultUser
         callback()
     }
 }

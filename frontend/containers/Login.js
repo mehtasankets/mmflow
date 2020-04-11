@@ -1,6 +1,5 @@
 import './Login.css'
 import React, { Component } from 'react'
-import { Form, Control, Button } from 'react-bootstrap'
 import { inject, observer } from 'mobx-react'
 import GoogleLogin from 'react-google-login'
 import Header from './Header'
@@ -31,7 +30,7 @@ class Login extends Component {
 
     render() {
         return <div className='login'>
-            <Header />
+            <Header {...this.props} />
             <GoogleLogin
                 clientId="1034128931991-b5lgu67qod6vbsgilml6ir7iuaffqevk.apps.googleusercontent.com"
                 buttonText="Login"

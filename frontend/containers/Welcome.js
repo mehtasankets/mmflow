@@ -32,7 +32,7 @@ class Welcome extends Component {
     render() {
         const { ExpenseSheetStore } = this.props
         return <div className='welcome'>
-            <Header />
+            <Header {...this.props} />
             <Row className='welcome-row'>
                 {
                     this.props.ExpenseSheetStore.expenseSheets.map(expenseSheet => (
