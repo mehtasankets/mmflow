@@ -1,10 +1,21 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val logback_version: String by project
 val ktor_version: String by project
 val kotlin_version: String by project
 
+buildscript {
+    repositories {
+        maven { url = uri("https://plugins.gradle.org/m2/") }
+    }
+    dependencies {
+        classpath("com.github.jengelman.gradle.plugins:shadow:5.2.0")
+    }
+}
+
+apply(plugin = "com.github.johnrengelman.shadow")
 plugins {
     application
     kotlin("jvm") version "1.3.61"
@@ -15,6 +26,16 @@ version = "0.0.1-SNAPSHOT"
 
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("mmflow")
+        mergeServiceFiles()
+        manifest {
+            attributes(mapOf("Main-Class" to "io.ktor.server.netty.EngineMain"))
+        }
+    }
 }
 
 repositories {
