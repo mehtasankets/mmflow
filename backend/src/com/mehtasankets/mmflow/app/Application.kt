@@ -37,7 +37,7 @@ val db = Db()
 val loggedInUsersCache = mutableMapOf<String, User>()
 var verifier: GoogleIdTokenVerifier =
     GoogleIdTokenVerifier.Builder(NetHttpTransport(), JacksonFactory.getDefaultInstance())
-        .setAudience(listOf("1034128931991-b5lgu67qod6vbsgilml6ir7iuaffqevk.apps.googleusercontent.com"))
+        .setAudience(listOf(System.getenv("CLIENT_ID")))
         .build()
 
 
