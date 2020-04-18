@@ -122,3 +122,11 @@ body {
 .modal {
   top: 10%;
 }
+
+.date-picker {
+  height: calc(1.5em + .75rem + 2px);
+  width: 100%;
+  padding-left: 5px;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+}

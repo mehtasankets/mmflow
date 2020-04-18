@@ -31,7 +31,13 @@ class ExpenseStore {
         this.expenses = expensesList.map(expenseJson => new Expense(
             expenseJson.expenseSheetName, expenseJson.id, expenseJson.date, expenseJson.description,
             expenseJson.category, expenseJson.paidBy, expenseJson.amount)
-        )
+        ).sort((a,b) => { 
+            let val = new Date(b.date) - new Date(a.date)
+            if (val != 0) {
+                return val
+            }
+            return b.id - a.id
+        })
     }
 
     @action addNewExpense = async (user, expenseSheetName) => {

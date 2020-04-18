@@ -11,16 +11,26 @@ class ExpenseForm extends Component {
         const expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
         e.preventDefault()
         this.props.ExpenseStore.expense.expenseSheetName = expenseSheetName
-        if (this.date)
+        if (this.date) {
             this.props.ExpenseStore.expense.date = this.date
-        if (this.description)
+            this.date = null
+        }
+        if (this.description) {
             this.props.ExpenseStore.expense.description = this.description
-        if (this.category)
+            this.description = null
+        }
+        if (this.category) {
             this.props.ExpenseStore.expense.category = this.category
-        if (this.paidBy)
+            this.category = null
+        }
+        if (this.paidBy) {
             this.props.ExpenseStore.expense.paidBy = this.paidBy
-        if (this.amount)
+            this.paidBy = null
+        }
+        if (this.amount) {
             this.props.ExpenseStore.expense.amount = this.amount
+            this.amount = null
+        }
 
         if (this.props.ExpenseStore.actionType == "New") {
             this.props.ExpenseStore.expense.id = -1
@@ -41,62 +51,59 @@ class ExpenseForm extends Component {
         const { ExpenseStore } = this.props
         const handleClose = () => { ExpenseStore.showForm = false }
         return <Modal show={ExpenseStore.showForm} onHide={handleClose} animation={false}
-            size="m" key={ExpenseStore.expense.description}>
+            size="lg" key={ExpenseStore.expense.description}>
             <Modal.Header closeButton>
                 <Modal.Title>{ExpenseStore.actionType}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
                     <Form.Row>
-                        <Col>
-                            <Form.Group>
-                                <Flatpickr placeholder='enter date'
-                                    defaultValue={ExpenseStore.expense.date.toISOString()} onChange={value => this.date = value[0]} />
-                            </Form.Group>
-                        </Col>
-                        <Col>
-                            <Form.Group>
-                                <Form.Control as="select"
-                                    defaultValue={ExpenseStore.expense.category} onChange={e => this.category = e.target.value}>
-                                    <option value="Food">Food</option>
-                                    <option value="Bills">Bills</option>
-                                    <option value="Entertainment">Entertainment</option>
-                                    <option value="Clothes">Clothes</option>
-                                    <option value="Travel">Travel</option>
-                                    <option value="Fuel">Fuel</option>
-                                    <option value="Misc">Misc</option>
-                                </Form.Control>
-                            </Form.Group>
-                        </Col>
-                    </Form.Row>
-                    <Form.Group>
-                        <Form.Control type="text" placeholder="Enter description" autoFocus onKeyPress={this.saveChanges}
-                            defaultValue={ExpenseStore.expense.description} onChange={e => this.description = e.target.value} />
-                    </Form.Group>
-                    <Form.Row>
+                        <Form.Group as={Col} md="4">
+                            <Form.Label>Date</Form.Label><br />
+                            <Flatpickr className='date-picker' placeholder='enter date'
+                                defaultValue={ExpenseStore.expense.date.toISOString()} onChange={value => this.date = value[0]} />
+                        </Form.Group>
                         <Form.Group as={Col}>
-                            <Form.Control type="number" placeholder="Enter amount" step='0.01' onKeyPress={this.saveChanges}
+                            <Form.Label>Category</Form.Label>
+                            <Form.Control as="select"
+                                defaultValue={ExpenseStore.expense.category} autoFocus onChange={e => this.category = e.target.value}>
+                                <option value="Food">Food</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Clothes">Clothes</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Fuel">Fuel</option>
+                                <option value="Misc">Misc</option>
+                            </Form.Control>
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group as={Col} md="4">
+                            <Form.Label>Amount</Form.Label>
+                            <Form.Control type="number" placeholder="Enter amount" min={0} step='0.01' onKeyPress={this.saveChanges}
                                 defaultValue={ExpenseStore.expense.amount} onChange={e => this.amount = e.target.value} />
                         </Form.Group>
                         <Form.Group as={Col}>
-                            <Form.Check inline defaultChecked={'Sanket' === ExpenseStore.expense.paidBy}
-                                onChange={e => this.paidBy = e.target.value}
-                                type='radio' name='paidBy' value='Sanket' label='Sanket'
-                            />
-                            <Form.Check inline defaultChecked={'Priyanka' === ExpenseStore.expense.paidBy}
-                                onChange={e => this.paidBy = e.target.value}
-                                type='radio' name='paidBy' value='Priyanka' label='Priyanka'
-                            />
+                            <Form.Label>Paid By</Form.Label>
+                            <Form.Control as="select"
+                                defaultValue={ExpenseStore.expense.paidBy} onChange={e => this.paidBy = e.target.value}>
+                                <option value="Sanket">Sanket</option>
+                                <option value="Priyanka">Priyanka</option>
+                            </Form.Control>
                         </Form.Group>
                     </Form.Row>
+                    <Form.Group>
+                        <Form.Label>Description</Form.Label>
+                        <Form.Control as="textarea" rows="2" placeholder="Enter description" onKeyPress={this.saveChanges}
+                            defaultValue={ExpenseStore.expense.description} onChange={e => this.description = e.target.value} />
+                    </Form.Group>
                 </Form>
             </Modal.Body>
-
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose} tabIndex={1}>Close</Button>
                 <Button variant="primary" onClick={e => this.addNewExpense(e)} tabIndex={0}>Save changes</Button>
             </Modal.Footer>
-        </Modal >
+        </Modal>
     }
 }
 export default ExpenseForm
