@@ -26,13 +26,11 @@ class Db {
     fun fetchExpenseSheets(user: User): List<ExpenseSheet> {
         val query = """
             SELECT user_identity, name, description, shared_with FROM expense_sheets
-            WHERE user_identity = ? OR shared_with like ?;
+            WHERE user_identity = '${user.identity}' OR shared_with like '%${user.identity}%';
         """.trimIndent()
         val expenseSheets = mutableListOf<ExpenseSheet>()
         createConnection().let { conn ->
             conn.prepareStatement(query).let { stmt ->
-                stmt.setString(1, user.identity)
-                stmt.setString(2, "%${user.identity}%")
                 stmt.executeQuery().let { rs ->
                     while (rs.next()) {
                         expenseSheets.add(
