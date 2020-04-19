@@ -104,7 +104,7 @@ fun Application.module(testing: Boolean = false) {
                 val user = getUser(call)
                 val expenseSheets = db.fetchExpenseSheets(user)
                 val filteredSheets =
-                    expenseSheets.filter { it.name != user.identity && !it.sharedWith.contains(user.identity) }
+                    expenseSheets.filter { it.userIdentity == user.identity || it.sharedWith.contains(user.identity) }
                 val serializedExpenseSheets = objectMapper.writeValueAsString(filteredSheets)
                 call.respondText(serializedExpenseSheets, ContentType.Application.Json)
             }
