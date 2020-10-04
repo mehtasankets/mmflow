@@ -1,4 +1,4 @@
-const webApiUrl = "http://192.168.1.22:8090/expense/"
+const webApiUrl = "http://mmflow-backend.mehtasanket.in/expense/"
 const userSessionHeader = "X-User-Session"
 
 class ExpenseService {
