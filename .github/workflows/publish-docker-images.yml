@@ -1,0 +1,65 @@
+name: My Ramblings Docker Image Publish Action
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag'     
+        required: true
+        default: 'v1.0.0'  
+  push:
+    tags: 
+      - v*
+
+jobs:
+
+  build:
+  
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    
+    - name: Extract version
+      run: |
+        chmod -R 777 ./
+        ls -al
+        echo workflowDispatcherVersion=${{ github.event.inputs.tag }}
+        echo githubRef=${{ github.ref }}
+        if [ ${{ github.event.inputs.tag }} ]; then
+          VERSION=${{ github.event.inputs.tag }}
+        else
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        fi
+        echo VERSION=$VERSION
+        echo "::set-env name=VERSION::$VERSION"
+        
+    - name: Login to docker hub
+      run: 
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username mehtasankets --password-stdin
+
+    - name: Create frontend docker image
+      run: |
+        pwd
+        cd frontend
+        pwd
+        echo version=$VERSION
+        docker build . --tag mehtasankets/mmflow-frontend:$VERSION
+
+    - name: Push frontend docker image
+      run: 
+        docker push mehtasankets/mmflow-frontend
+
+    - name: Create backend docker image
+      run: |
+        pwd
+        cd backend
+        pwd
+        echo version=$VERSION
+        docker build . --tag mehtasankets/mmflow-backend:$VERSION
+    
+    - name: Push backend docker image
+      run: 
+        docker push mehtasankets/mmflow-backend

@@ -1,0 +1,3 @@
+VERSION=<docker-image-version>
+MMFLOW_DB_HOST_LOCATION=<mmflow.db-file-location>
+CLIENT_ID=<client-id-from-gcp>
