@@ -57,9 +57,15 @@ server {
 
 ### Project setup
 `git clone https://github.com/mehtasankets/mmflow.git`
+
 (mmflow.db) Run db query versions if any
+
 (frontend) `npm install`
+
 (frontend) `npm run dev &`
-(deployment) `export MMFLOW_DB_NAME=/home/mehtasankets/mmflow.db`
+
+(deployment) `export MMFLOW_DB_HOST_LOCATION=/home/mehtasankets/mmflow.db`
+
 (deployment) `export CLIENT_ID=<GOOGLE-OAUTH-CLIENT-ID>` 	# Get it from GCP
+
 (deployment) `java -server -jar mmflow-0.0.1-SNAPSHOT-all.jar`

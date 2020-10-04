@@ -12,10 +12,11 @@ Follow instructions from http://nginx.org/en/docs/windows.html
 ### Configure nginx.conf:
 vim `server` block in <nginx-folder>/conf/nginx.conf
 ```
-listen 80;
-server_name mmflow.mehtasanket-dev.in; # Change it to your domain
+listen       80;
+listen       [::]:80;
+server_name mmflow.mehtasanket-dev.in;
 location / {
-  proxy_pass "http://127.0.0.1:8080"
+    proxy_pass http://localhost:8080;
 }
 ```
 

@@ -1,2 +1,2 @@
-export MMFLOW_DB_NAME=/mnt/f/Workspace/mmflow.db
+export MMFLOW_DB_HOST_LOCATION=/mnt/f/Workspace/mmflow.db
 ./gradlew run

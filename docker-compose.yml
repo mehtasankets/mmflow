@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+    frontend:
+        image: mmflow-frontend
+        ports:
+            - "8080:8080"
+    backend:
+        image: mmflow-backend
+        environment: 
+            - MMFLOW_DB_PATH=/mmflow.db
+            - CLIENT_ID
+        ports:
+            - "8090:8090"
+        volumes:
+            - ${MMFLOW_DB_HOST_LOCATION}:/mmflow.db

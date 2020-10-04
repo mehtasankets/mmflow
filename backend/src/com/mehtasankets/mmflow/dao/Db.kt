@@ -15,7 +15,7 @@ class Db {
     private var objectMapper: ObjectMapper
 
     init {
-        val dbPath = System.getenv("MMFLOW_DB_NAME")
+        val dbPath = System.getenv("MMFLOW_DB_PATH")
         dbUrl = "jdbc:sqlite:$dbPath"
         objectMapper = ObjectMapper().findAndRegisterModules()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
