@@ -72,9 +72,11 @@ Access the site at http://mmflow.mehtasanket-dev.in/
 * `sudo apt-get install sqlite3`
 
 ### Project setup
-* `git clone https://github.com/mehtasankets/mmflow.git`
-* cd mmflow
+* (One time) `git clone https://github.com/mehtasankets/mmflow.git`
+* `cd mmflow`
+* `git pull`
+* (One time) `cp prod-env.list-tmpl prod-env.list`
+* (One time) Edit prod-env.list to populate environment variables
 * Run db query versions if any
-* `cp prod-env.list-tmpl prod-env.list`
-* Edit prod-env.list to populate environment variables
+* `docker-compose down`
 * `./run.sh`
