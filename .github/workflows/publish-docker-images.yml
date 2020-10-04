@@ -42,17 +42,23 @@ jobs:
 
     - name: Create frontend docker image
       run: |
+        pwd
+        cd frontend
+        pwd
         echo version=$VERSION
-        docker build . --file frontend/Dockerfile --tag mehtasankets/mmflow-frontend:$VERSION
+        docker build . --tag mehtasankets/mmflow-frontend:$VERSION
 
-    - name: Create backend docker image
-      run: |
-        echo version=$VERSION
-        docker build . --file backend/Dockerfile --tag mehtasankets/mmflow-backend:$VERSION
-    
     - name: Push frontend docker image
       run: 
         docker push mehtasankets/mmflow-frontend
+
+    - name: Create backend docker image
+      run: |
+        pwd
+        cd backend
+        pwd
+        echo version=$VERSION
+        docker build . --tag mehtasankets/mmflow-backend:$VERSION
     
     - name: Push backend docker image
       run: 
