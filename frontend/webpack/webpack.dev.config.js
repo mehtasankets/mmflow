@@ -15,13 +15,13 @@ module.exports = {
                 loader: 'babel-loader'
             },{
                 test: /\.css$/,
-                loaders: ["style-loader", "css-loader"]
+                use: ["style-loader", "css-loader"]
             },{
                 test: /\.less$/,
-                loaders: ["style-loader", "css-loader", "less-loader"]
+                use: ["style-loader", "css-loader", "less-loader"]
             },{
                 test: /\.s[ac]ss$/,
-                loader: ["style-loader", "css-loader", "sass-loader"]
+                use: ["style-loader", "css-loader", "sass-loader"]
             }
         ]
     },
