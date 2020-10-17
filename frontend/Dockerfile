@@ -1,4 +1,4 @@
-FROM node:8.10.0 AS builder
+FROM node:12.19.0 AS builder
 
 COPY . /home/frontend
 
@@ -6,7 +6,7 @@ WORKDIR /home/frontend
 
 RUN npm install
 
-FROM node:8.10.0
+FROM node:12.19.0
 
 COPY --from=builder /home/frontend .
 
