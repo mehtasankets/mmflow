@@ -8,6 +8,7 @@ import com.mehtasankets.mmflow.domain.SummaryData
 import com.mehtasankets.mmflow.domain.User
 import java.sql.DriverManager
 import java.time.Instant
+import kotlin.math.roundToInt
 
 
 class Db {
@@ -183,21 +184,23 @@ class Db {
     ): SummaryData {
         val expenses = fetchExpenses(expenseSheetName, startDateIncluding, endDateExcluding)
         val prevExpenses = fetchExpenses(expenseSheetName, prevStartDateIncluding, prevEndDateExcluding)
-        val total = expenses.map { it.amount }.sum()
-        val previousTotal = prevExpenses.map { it.amount }.sum()
+        val total = expenses.map { it.amount }.sum().times(100.0).roundToInt().div(100.0)
+        val previousTotal = prevExpenses.map { it.amount }.sum().times(100.0).roundToInt().div(100.0)
         val totalByCategory = expenses.groupingBy { it.category }.aggregate { _, accumulator: Double?, element, _ ->
             when (accumulator) {
                 null -> element.amount
                 else -> accumulator + element.amount
             }
-        }
+        }.mapValues { it.value?.times(100.0)?.roundToInt()?.div(100.0) }
+        println(totalByCategory)
         val totalByUser = expenses.groupingBy { it.paidBy }.aggregate { _, accumulator: Double?, element, first ->
             if (first) {
                 element.amount
             } else {
                 accumulator!! + element.amount
             }
-        }
+        }.mapValues { it.value?.times(100.0)?.roundToInt()?.div(100.0) }
+        println(totalByUser)
         return SummaryData(
             total,
             previousTotal,
