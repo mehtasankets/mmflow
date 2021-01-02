@@ -12,23 +12,19 @@ import com.mehtasankets.mmflow.domain.*
 import com.mehtasankets.mmflow.util.AuthenticationUtil
 import com.mehtasankets.mmflow.util.Constants
 import io.ktor.application.*
-import io.ktor.features.CORS
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.receiveText
-import io.ktor.request.uri
-import io.ktor.response.respondText
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.header
-import io.ktor.sessions.sessions
+import io.ktor.sessions.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
-import java.time.temporal.TemporalAdjusters
 import java.util.*
-import kotlin.math.exp
+import kotlin.collections.set
 
 
 val objectMapper: ObjectMapper = ObjectMapper().findAndRegisterModules()
@@ -45,7 +41,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
+fun Application.module(@Suppress("UNUSED_PARAMETER") testing: Boolean = false) {
 
     install(CORS) {
         method(HttpMethod.Head)
@@ -67,7 +63,7 @@ fun Application.module(testing: Boolean = false) {
     }
 
     intercept(ApplicationCallPipeline.Call) {
-        if (!call.request.uri.contains("/login")) {
+        if (!call.request.uri.contains("/login") && System.getProperty("app.mode", "prod").equals("prod", true)) {
             val authenticationResult = AuthenticationUtil.authenticate(call)
             if (!authenticationResult.first) {
                 call.respondText("Unauthenticated call", status = HttpStatusCode.Unauthorized)
@@ -79,14 +75,28 @@ fun Application.module(testing: Boolean = false) {
         route("/expense") {
 
             post("/login") {
-                val sessionId = "${UUID.randomUUID()}-${System.currentTimeMillis()}"
-                val user = objectMapper.readValue<User>(call.receiveText())
-                val idToken: GoogleIdToken = verifier.verify(user.idToken)
-                if (idToken == null) {
-                    call.respondText("User is not authenticated", status = HttpStatusCode.Unauthorized)
+                var sessionId = "${UUID.randomUUID()}-${System.currentTimeMillis()}"
+                val user = if (System.getProperty("app.mode", "prod").equals("prod", true)) {
+                    val user = objectMapper.readValue<User>(call.receiveText())
+                    val idToken: GoogleIdToken? = withContext(Dispatchers.IO) {
+                        verifier.verify(user.idToken)
+                    }
+                    if (idToken == null) {
+                        call.respondText("User is not authenticated", status = HttpStatusCode.Unauthorized)
+                    }
+                    user.identity = idToken!!.payload.subject
+                    user.sessionId = sessionId
+                    user
+                } else {
+                    sessionId = "test-123"
+                    User(
+                        sessionId,
+                        "test-token",
+                        "tester",
+                        "dev, tester",
+                        ""
+                    )
                 }
-                user.identity = idToken.payload.subject
-                user.sessionId = sessionId
                 loggedInUsersCache[sessionId] = user
                 call.sessions.set(Constants.USER_SESSION_HEADER, UserSession(sessionId))
                 call.respondText { "${user.displayName} Logged in successfully." }
@@ -105,49 +115,59 @@ fun Application.module(testing: Boolean = false) {
                 val expenseSheets = db.fetchExpenseSheets(user)
                 val filteredSheets =
                     expenseSheets.filter { it.userIdentity == user.identity || it.sharedWith.contains(user.identity) }
-                val serializedExpenseSheets = objectMapper.writeValueAsString(filteredSheets)
+                val serializedExpenseSheets =
+                    withContext(Dispatchers.IO) { objectMapper.writeValueAsString(filteredSheets) }
                 call.respondText(serializedExpenseSheets, ContentType.Application.Json)
             }
 
             get {
                 val expenseSheetName = call.parameters["expenseSheetName"] ?: ""
-                val monthStart = Instant.now().atZone(ZoneId.systemDefault()).withDayOfMonth(1).toInstant()
+                val currentTime = LocalDate.now(ZoneId.systemDefault())
+                val monthStart =
+                    currentTime.withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                val nextMonthStart =
+                    currentTime.plusMonths(1).withDayOfMonth(1)
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
                 val startDate = Instant.parse(call.parameters["startDate"] ?: monthStart.toString())
-                val endDate = Instant.parse(call.parameters["endDate"] ?: Instant.now().toString())
+                val endDate = Instant.parse(call.parameters["endDate"] ?: nextMonthStart.toString())
                 val expenses = db.fetchExpenses(expenseSheetName, startDate, endDate)
-                val serializedExpenses = objectMapper.writeValueAsString(expenses)
+                val serializedExpenses = withContext(Dispatchers.IO) { objectMapper.writeValueAsString(expenses) }
                 call.respondText(serializedExpenses, ContentType.Application.Json)
             }
 
             get("/summary") {
                 val expenseSheetName = call.parameters["expenseSheetName"] ?: ""
-                val monthStart = Instant.now().atZone(ZoneId.systemDefault()).withDayOfMonth(1).toInstant()
-                val monthEnd =
-                    Instant.now().atZone(ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfMonth()).toInstant()
+                val currentTime = LocalDate.now(ZoneId.systemDefault())
                 val prevMonthStart =
-                    Instant.now().atZone(ZoneId.systemDefault()).minusMonths(1).withDayOfMonth(1).toInstant()
-                val prevMonthEnd =
-                    Instant.now().atZone(ZoneId.systemDefault()).minusMonths(1).with(TemporalAdjusters.lastDayOfMonth())
+                    currentTime.minusMonths(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                val monthStart =
+                    currentTime.withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                val nextMonthStart =
+                    currentTime.plusMonths(1).withDayOfMonth(1)
+                        .atStartOfDay(ZoneId.systemDefault())
                         .toInstant()
 
-                val yearStart = Instant.now().atZone(ZoneId.systemDefault()).withMonth(1).withDayOfMonth(1).toInstant()
-                val yearEnd =
-                    Instant.now().atZone(ZoneId.systemDefault()).withMonth(12).with(TemporalAdjusters.lastDayOfMonth())
-                        .toInstant()
                 val prevYearStart =
-                    yearStart.atZone(ZoneId.systemDefault()).minusYears(1).withDayOfMonth(1).toInstant()
-                val prevYearEnd =
-                    yearEnd.atZone(ZoneId.systemDefault()).minusYears(1).with(TemporalAdjusters.lastDayOfMonth())
+                    currentTime.minusYears(1).withMonth(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                val yearStart =
+                    currentTime.withMonth(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+                val nextYearStart =
+                    currentTime.plusYears(1).withMonth(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault())
                         .toInstant()
 
                 val monthlySummaryData =
-                    db.fetchSummary(expenseSheetName, monthStart, monthEnd, prevMonthStart, prevMonthEnd)
+                    db.fetchSummary(expenseSheetName, monthStart, nextMonthStart, prevMonthStart, monthStart)
                 val yearlySummaryData =
-                    db.fetchSummary(expenseSheetName, yearStart, yearEnd, prevYearStart, prevYearEnd)
+                    db.fetchSummary(expenseSheetName, yearStart, nextYearStart, prevYearStart, yearStart)
                 val summary =
                     Summary(monthlySummaryData, yearlySummaryData)
 
-                val serializedSummary = objectMapper.writeValueAsString(summary)
+                val serializedSummary = withContext(Dispatchers.IO) { objectMapper.writeValueAsString(summary) }
                 call.respondText(serializedSummary, ContentType.Application.Json)
             }
 
@@ -187,7 +207,7 @@ fun Application.module(testing: Boolean = false) {
             delete {
                 val data = objectMapper.readValue<Map<String, Any>>(call.receiveText())
                 val expenseSheetName = data["expenseSheetName"] as String
-                val expenseIds = data["expenseIds"] as List<Long>
+                @Suppress("UNCHECKED_CAST") val expenseIds = data["expenseIds"] as List<Long>
                 val count = db.deleteExpenses(expenseSheetName, expenseIds)
                 call.respondText(count.toString(), ContentType.Application.Json)
             }
@@ -196,6 +216,10 @@ fun Application.module(testing: Boolean = false) {
 }
 
 fun getUser(call: ApplicationCall): User {
-    val userSession = call.sessions.get(Constants.USER_SESSION_HEADER) as UserSession
+    val userSession = if (System.getProperty("app.mode", "prod").equals("prod", true)) {
+        call.sessions.get(Constants.USER_SESSION_HEADER) as UserSession
+    } else {
+        UserSession("test-123")
+    }
     return loggedInUsersCache[userSession.sessionId]!!
 }
