@@ -48,7 +48,7 @@ jobs:
         echo version=$VERSION
         echo version=${{ env.VERSION }}
         echo "version=${{ env.VERSION }}"
-        docker build . --tag mehtasankets/mmflow-frontend:${{ VERSION }}
+        docker build . --tag mehtasankets/mmflow-frontend:${{ env.VERSION }}
 
     - name: Push frontend docker image
       run: 
