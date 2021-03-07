@@ -32,7 +32,7 @@ class Login extends Component {
         return <div className='login'>
             <Header {...this.props} />
             <GoogleLogin
-                clientId="1034128931991-b5lgu67qod6vbsgilml6ir7iuaffqevk.apps.googleusercontent.com"
+                clientId="534936470564-h75v3gcql2vlrph63qc0i1scsdbak94h.apps.googleusercontent.com"
                 buttonText="Login"
                 onSuccess={this.login}
                 onFailure={this.showException}
