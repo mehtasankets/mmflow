@@ -45,9 +45,10 @@ jobs:
         pwd
         cd frontend
         pwd
-        echo version=${VERSION}
-        echo version=${{env.VERSION}}
-        docker build . --tag mehtasankets/mmflow-frontend:${VERSION}
+        echo version=$VERSION
+        echo version=${{ env.VERSION }}
+        echo "version=${{ env.VERSION }}"
+        docker build . --tag mehtasankets/mmflow-frontend:${{ VERSION }}
 
     - name: Push frontend docker image
       run: 
