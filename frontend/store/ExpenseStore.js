@@ -27,7 +27,11 @@ class ExpenseStore {
     @action getExpenses = async (user, expenseSheetName) => {
         let today = new Date()
         let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-        const expensesList = await expenseService.get(user, expenseSheetName, startOfMonth.toISOString(), today.toISOString())
+        await this.getExpensesForDates(user, expenseSheetName, startOfMonth, today)
+    }
+
+    @action getExpensesForDates = async (user, expenseSheetName, startDate, endDate) => {
+        const expensesList = await expenseService.get(user, expenseSheetName, startDate.toISOString(), endDate.toISOString())
         this.expenses = expensesList.map(expenseJson => new Expense(
             expenseJson.expenseSheetName, expenseJson.id, expenseJson.date, expenseJson.description,
             expenseJson.category, expenseJson.paidBy, expenseJson.amount)

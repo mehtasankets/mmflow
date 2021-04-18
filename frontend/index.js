@@ -8,6 +8,7 @@ import ProtectedRoute from './containers/ProtectedRoute'
 import Login from './containers/Login'
 import Welcome from './containers/Welcome'
 import Details from './containers/Details'
+import Analyze from './containers/Analyze'
 import ExpenseStore from './store/ExpenseStore'
 import UserStore from './store/UserStore'
 import ExpenseSheetStore from './store/ExpenseSheetStore'
@@ -18,6 +19,7 @@ const Root = (
             <Route exact path={["", "/", "/login"]} component={Login} />
             <ProtectedRoute exact path="/welcome" component={Welcome} />
             <ProtectedRoute exact path="/details" component={Details} />
+            <ProtectedRoute exact path="/analyze" component={Analyze} />
         </Provider>
     </BrowserRouter>
 )

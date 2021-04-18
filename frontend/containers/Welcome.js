@@ -16,8 +16,12 @@ class Welcome extends Component {
         ExpenseSheetStore.getExpenseSheets(UserStore.user)
     }
 
-    redirect = (expenseSheetName) => {
+    redirectToDetails = (expenseSheetName) => {
         this.props.history.push("/details?expenseSheetName=" + expenseSheetName)
+    }
+
+    redirectToAnalyze = (expenseSheetName) => {
+        this.props.history.push("/analyze?expenseSheetName=" + expenseSheetName)
     }
 
     delete = (expenseSheetName) => {
@@ -55,7 +59,8 @@ class Welcome extends Component {
                                     <Card.Text>
                                         {expenseSheet.description}
                                     </Card.Text>
-                                    <Button variant="primary" style={{ cursor: 'pointer' }} onClick={() => this.redirect(expenseSheet.name)}>Open Sheet</Button>{' '}
+                                    <Button variant="primary" style={{ cursor: 'pointer' }} onClick={() => this.redirectToDetails(expenseSheet.name)}>Open Sheet</Button>{' '}
+                                    <Button variant="secondary" style={{ cursor: 'pointer' }} onClick={() => this.redirectToAnalyze(expenseSheet.name)}>Analyze</Button>{' '}
                                     <Button variant="success">Share</Button>
                                 </Card.Body>
                             </Card>
