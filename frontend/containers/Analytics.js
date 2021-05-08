@@ -72,7 +72,7 @@ class Analytics extends Component {
 				                        <Tooltip />
 				                        <Legend />
 				                        <Bar dataKey="amountBySanket" stackId="a" fill="#8884d8" />
-				                        <Bar dataKey="amountByPriyanka" stackId="a" fill="#82ca9d" />
+				                        <Bar dataKey="amountByPriyanka" stackId="a" fill="#82ca9d" label={{ position: 'top' }} />
                                     </BarChart>
                                 </Col>
                             </Row>
