@@ -3,6 +3,9 @@ import { inject, observer } from 'mobx-react'
 import { Row, Col, Card } from 'react-bootstrap'
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import 'react-pivottable/pivottable.css';
+import TableRenderers from 'react-pivottable/TableRenderers';
+import Plot from 'react-plotly.js';
+import createPlotlyRenderers from 'react-pivottable/PlotlyRenderers';
 
 @inject('ExpenseStore', 'UserStore')
 @observer
@@ -26,6 +29,7 @@ class PivotAnalytics extends Component {
     }
 
     render() {
+        const PlotlyRenderers = createPlotlyRenderers(Plot);
         const { ExpenseStore } = this.props
         return <div className='main-component pivot-analytics'>
             <Row className='pivot-analytics-row'>
@@ -38,6 +42,7 @@ class PivotAnalytics extends Component {
                                     <PivotTableUI
                                         data={this.formatData(ExpenseStore.expenses)}
                                         onChange={s => this.setState(s)}
+                                        renderers={Object.assign({}, TableRenderers, PlotlyRenderers)}
                                         {...this.state}
                                     />
                                 </Col>
