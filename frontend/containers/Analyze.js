@@ -8,6 +8,7 @@ import { inject, observer } from 'mobx-react'
 import Header from './Header'
 import Summary from './Summary'
 import Analytics from './Analytics'
+import PivotAnalytics from './PivotAnalytics'
 
 @inject('ExpenseStore')
 @observer
@@ -18,6 +19,7 @@ class Analyze extends Component {
             <Header {...this.props} />
             <Summary {...this.props} />
             <Analytics {...this.props} />
+            <PivotAnalytics {...this.props} />
         </div>
     }
 }

@@ -49,7 +49,6 @@ class Analytics extends Component {
             item.amountByPriyanka += o.amountByPriyanka;
             return r.set(key, item);
           }, new Map).values()];
-          console.log(result);
           return result;
     }
 
