@@ -1,21 +1,18 @@
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { Row, Col, Card } from 'react-bootstrap'
-import { CartesianGrid, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts'
+import { CartesianGrid, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, LabelList } from 'recharts'
 
-const COLORS = ["#663300", "#006633", "#330066", "#aaaa00", "#00aaaa", "#aa00aa", "#ff0000", "#00ff00", "#0000ff"]
-
-const RADIAN = Math.PI / 180
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.7
-    const x = cx + radius * Math.cos(-midAngle * RADIAN)
-    const y = cy + radius * Math.sin(-midAngle * RADIAN)
+const renderCustomizedLabel = (props) => {
+    const { x, y, width, value } = this.props;
+    console.log(value)
     return (
-        <text x={x} y={y} fill="white" textAnchor={x > cx ? "start" : "end"} dominantBaseline="central">
-            {`${(percent * 100).toFixed(0)}%`}
-        </text>
-    )
-}
+        <g>
+            <text x={x + (width / 2)} y={y - 10} textAnchor="middle">{value}</text>
+        </g>
+    );
+};
+
 @inject('ExpenseStore', 'UserStore')
 @observer
 class Analytics extends Component {
@@ -49,7 +46,6 @@ class Analytics extends Component {
             item.amountByPriyanka += o.amountByPriyanka;
             return r.set(key, item);
           }, new Map).values()];
-          console.log(result);
           return result;
     }
 
@@ -71,8 +67,12 @@ class Analytics extends Component {
 				                        <YAxis />
 				                        <Tooltip />
 				                        <Legend />
-				                        <Bar dataKey="amountBySanket" stackId="a" fill="#8884d8" />
-				                        <Bar dataKey="amountByPriyanka" stackId="a" fill="#82ca9d" />
+				                        <Bar dataKey="amountBySanket" stackId="a" fill="#8884d8">
+                                            <LabelList dataKey="amount" content={renderCustomizedLabel} />
+                                        </Bar>
+				                        <Bar dataKey="amountByPriyanka" stackId="a" fill="#82ca9d">
+                                            <LabelList dataKey="amount" content={renderCustomizedLabel} />
+                                        </Bar>
                                     </BarChart>
                                 </Col>
                             </Row>
