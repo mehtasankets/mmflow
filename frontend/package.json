@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js"
+    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js",
+    "build": "./node_modules/.bin/webpack --config ./webpack/webpack.prod.config.js && cp index.html dist/index.html",
+    "start": "cd dist/ && ./../node_modules/.bin/http-server"
   },
   "author": "mehtasankets (Sanket Mehta)",
   "license": "ISC",
@@ -14,6 +16,7 @@
     "ag-grid-react": "^22.1.1",
     "bootstrap": "^4.4.1",
     "flatpickr": "^4.6.2",
+    "http-server": "^14.1.1",
     "kind-of": ">=6.0.3",
     "minimist": ">=1.2.2",
     "mobx": "^5.13.0",
