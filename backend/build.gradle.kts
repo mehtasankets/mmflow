@@ -40,9 +40,9 @@ tasks {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     jcenter()
-    maven { url = uri("https://kotlin.bintray.com/ktor") }
-    maven { url = uri("https://kotlin.bintray.com/kotlin-js-wrappers") }
+    maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers/") }
 }
 
 dependencies {
