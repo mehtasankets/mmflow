@@ -27,7 +27,8 @@ class ExpenseStore {
     @action getExpenses = async (user, expenseSheetName) => {
         let today = new Date()
         let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-        await this.getExpensesForDates(user, expenseSheetName, startOfMonth, today)
+        let nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+        await this.getExpensesForDates(user, expenseSheetName, startOfMonth, nextMonthStart)
     }
 
     @action getExpensesForDates = async (user, expenseSheetName, startDate, endDate) => {

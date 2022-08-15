@@ -41,7 +41,7 @@ class DataGrid extends Component {
             {
                 field: "date", headerName: "Date",
                 valueFormatter: function (params) {
-                    return params.value.toISOString()
+                    return params.value.toLocaleDateString("en-CA");
                 }
             },
             { field: "description", headerName: "Description" },
