@@ -80,3 +80,9 @@ Access the site at http://mmflow.mehtasanket-dev.in/
 * Run db query versions if any
 * `docker-compose down`
 * `./run.sh`
+
+### Copy over file from oracle cloud to windows machine
+Run following command on powershell
+```
+pscp -P 22 -scp -i C:\work\personal\OracleCloud\for-putty.ppk  ubuntu@<IP_ADDRESS>:/home/ubuntu/databases/expenses.csv .
+```
