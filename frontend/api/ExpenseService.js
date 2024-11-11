@@ -1,4 +1,4 @@
-const webApiUrl = "https://mmflow-backend.mehtasanket.in/expense/"
+const webApiUrl = "https://mmflow-backend.mehtasanket.in/expense"
 const userSessionHeader = "X-User-Session"
 
 class ExpenseService {
@@ -10,7 +10,7 @@ class ExpenseService {
             method: "GET",
             headers
         }
-        const request = new Request(webApiUrl + `expenseSheet`, options)
+        const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
         return response.json()
     }
@@ -25,7 +25,7 @@ class ExpenseService {
             headers,
             body: JSON.stringify(expenseSheets)
         }
-        const request = new Request(webApiUrl + `expenseSheet`, options)
+        const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
         return response.json()
     }
@@ -40,7 +40,7 @@ class ExpenseService {
             headers,
             body: JSON.stringify(sharingDetails)
         }
-        const request = new Request(webApiUrl + `expenseSheet`, options)
+        const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
         return response.json()
     }
@@ -55,7 +55,7 @@ class ExpenseService {
             headers,
             body: JSON.stringify(expenseSheetNames)
         }
-        const request = new Request(webApiUrl + `expenseSheet`, options)
+        const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
         return response.json()
     }
@@ -80,7 +80,7 @@ class ExpenseService {
             method: "GET",
             headers
         }
-        const request = new Request(webApiUrl + `summary?expenseSheetName=${expenseSheetName}`, options)
+        const request = new Request(webApiUrl + `/summary?expenseSheetName=${expenseSheetName}`, options)
         const response = await fetch(request)
         return response.json()
     }

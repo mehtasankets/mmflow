@@ -1,4 +1,4 @@
-const webApiUrl = "https://mmflow-backend.mehtasanket.in/expense/"
+const webApiUrl = "https://mmflow-backend.mehtasanket.in/expense"
 const userSessionHeader = "X-User-Session"
 
 class AuthService {
@@ -12,7 +12,7 @@ class AuthService {
             headers,
             body: JSON.stringify(user)
         }
-        const request = new Request(webApiUrl + 'login', options)
+        const request = new Request(webApiUrl + '/login', options)
         const response = await fetch(request)
         return response.headers.get('X-User-Session')
     }
@@ -25,7 +25,7 @@ class AuthService {
             method: "POST",
             headers
         }
-        const request = new Request(webApiUrl + 'logout', options)
+        const request = new Request(webApiUrl + '/logout', options)
         await fetch(request)
     }
 }
