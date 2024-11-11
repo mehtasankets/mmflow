@@ -18,7 +18,7 @@ buildscript {
 apply(plugin = "com.github.johnrengelman.shadow")
 plugins {
     application
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.5.10"
 }
 
 group = "com.mehtasankets.mmflow"
@@ -50,7 +50,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-html-builder:1.6.8")
+    implementation("io.ktor:ktor-html-builder:1.6.0")
     implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41")
     implementation("org.xerial:sqlite-jdbc:3.30.1")
     implementation("com.fasterxml.jackson.core:jackson-core:2.10.3")
