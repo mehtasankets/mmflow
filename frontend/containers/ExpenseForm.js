@@ -69,11 +69,14 @@ class ExpenseForm extends Component {
                                 defaultValue={ExpenseStore.expense.category} autoFocus onChange={e => this.category = e.target.value}>
                                 <option value="Groceries">Groceries</option>
                                 <option value="ReadyMadeFood">Ready made food</option>
-                                <option value="Prenatal">Prenatal</option>
                                 <option value="Bills">Bills</option>
                                 <option value="Entertainment">Entertainment</option>
                                 <option value="Transport">Transport</option>
                                 <option value="HouseUtilities">House utilities</option>
+                                <option value="Toys">Toys</option>
+                                <option value="Books">Books</option>
+                                <option value="Health">Health</option>
+                                <option value="Education">Education</option>
                                 <option value="Painting">Painting</option>
                                 <option value="Clothes">Clothes</option>
                                 <option value="Trips">Trips</option>

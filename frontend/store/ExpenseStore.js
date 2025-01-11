@@ -4,7 +4,7 @@ import Summary from './Summary'
 import SummaryData from './SummaryData'
 import expenseService from '../api/ExpenseService'
 
-const defaultExpense = new Expense("", -1, new Date().toISOString(), "", "Food", "Sanket", 0)
+const defaultExpense = new Expense("", -1, new Date().toISOString(), "", "Groceries", "Sanket", 0)
 
 const defaultSummary = new Summary("", new SummaryData(), new SummaryData())
 
