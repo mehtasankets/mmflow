@@ -81,6 +81,8 @@ class ExpenseForm extends Component {
                                 <option value="Clothes">Clothes</option>
                                 <option value="Trips">Trips</option>
                                 <option value="Gifts">Gifts</option>
+                                <option value="PersonalGrooming">Personal Grooming</option>
+                                <option value="ExtendedFamilyExpenses">Extended Family Expenses</option>
                                 <option value="Misc">Misc</option>
                             </Form.Control>
                         </Form.Group>
