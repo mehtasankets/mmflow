@@ -49,7 +49,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-html-builder:1.6.0")
-    implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-css-jvm:2025.6.13")
     implementation("org.xerial:sqlite-jdbc:3.30.1")
     implementation("com.fasterxml.jackson.core:jackson-core:2.10.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.3")
