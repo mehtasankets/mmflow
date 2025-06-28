@@ -1,4 +1,4 @@
-const webApiUrl = "https://mmflow-backend.mehtasanket.in/expense"
+const webApiUrl = "http://mmflow-backend.mehtasanket.in/expense"
 const userSessionHeader = "X-User-Session"
 
 class AuthService {
