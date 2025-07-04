@@ -31,16 +31,9 @@ application {
 tasks {
     named<ShadowJar>("shadowJar") {
         archiveBaseName.set("mmflow")
-        mergeServiceFiles()
         manifest {
             attributes(mapOf("Main-Class" to "io.ktor.server.netty.EngineMain"))
         }
-    }
-    
-    // Exclude shadowJar from the build task to avoid compatibility issues
-    // This allows the main build to succeed while shadowJar can be run separately if needed
-    named("build") {
-        setDependsOn(listOf("jar", "test"))
     }
 }
 
