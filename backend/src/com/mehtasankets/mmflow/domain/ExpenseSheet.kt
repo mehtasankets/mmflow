@@ -1,8 +1,8 @@
 package com.mehtasankets.mmflow.domain
 
 data class ExpenseSheet (
-    var userIdentity: String?,
-    val name: String,
-    val description: String,
-    val sharedWith: MutableList<String>
+    var userIdentity: String? = null,
+    var name: String = "",
+    var description: String = "",
+    var sharedWith: MutableList<String> = mutableListOf()
 )

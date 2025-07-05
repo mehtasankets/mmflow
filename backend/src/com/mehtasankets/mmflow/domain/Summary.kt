@@ -1,13 +1,13 @@
 package com.mehtasankets.mmflow.domain
 
 data class Summary (
-    val monthToDateSummary: SummaryData,
-    val yearToDateSummary: SummaryData
+    var monthToDateSummary: SummaryData? = null,
+    var yearToDateSummary: SummaryData? = null
 )
 
 data class SummaryData (
-    val total: Double,
-    val previousTotal: Double,
-    val totalByCategory: Map<String, Double?>,
-    val totalByUser: Map<String, Double?>
+    var total: Double = 0.0,
+    var previousTotal: Double = 0.0,
+    var totalByCategory: Map<String, Double?> = mapOf(),
+    var totalByUser: Map<String, Double?>? = mapOf()
 )

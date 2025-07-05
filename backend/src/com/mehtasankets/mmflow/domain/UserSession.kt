@@ -1,3 +1,3 @@
 package com.mehtasankets.mmflow.domain
 
-class UserSession(val sessionId: String)
+class UserSession(val sessionId: String = "")
