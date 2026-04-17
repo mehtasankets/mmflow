@@ -27,6 +27,7 @@
 ### Start local instance
 * Start Nginx: `start nginx`
 * Run containers: `./local-run.sh`
+* For local frontend testing, you can skip Google auth by clicking **Continue as Dev User** on the login page when running on `localhost`. (`docker-compose-dev.yml` starts backend with `app.mode=dev`.)
 
 Access the site at http://mmflow.mehtasanket-dev.in/
 

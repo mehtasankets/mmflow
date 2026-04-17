@@ -9,6 +9,7 @@ services:
         environment: 
             - MMFLOW_DB_PATH=/mmflow.db
             - CLIENT_ID
+            - JAVA_TOOL_OPTIONS=-Dapp.mode=dev
         ports:
             - "8090:8090"
         volumes:
