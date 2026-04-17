@@ -28,6 +28,21 @@ class Login extends Component {
         Window.alert(response)
     }
 
+    isLocalDev = () => {
+        const hostname = window.location.hostname
+        return hostname === 'localhost' || hostname === '127.0.0.1'
+    }
+
+    loginForDev = () => {
+        this.props.UserStore.loginForDev(() => {
+            let destination = '/welcome'
+            if (this.props.location.state && this.props.location.state.from) {
+                destination = this.props.location.state.from
+            }
+            this.props.history.push(destination)
+        })
+    }
+
     render() {
         return <div className='login'>
             <Header {...this.props} />
@@ -39,6 +54,12 @@ class Login extends Component {
                 cookiePolicy={'single_host_origin'}
                 isSignedIn={true}
             />
+            {
+                this.isLocalDev() &&
+                <div style={{ marginTop: '1rem' }}>
+                    <button className="btn btn-secondary" onClick={this.loginForDev}>Continue as Dev User</button>
+                </div>
+            }
         </div >
     }
 }

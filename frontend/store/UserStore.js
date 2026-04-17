@@ -29,6 +29,12 @@ class UserStore {
         this.user = defaultUser
         callback()
     }
+
+    @action loginForDev = (callback) => {
+        this.user = new User("test-123", "dev-user", "Local Dev User", "")
+        this.isAuthenticated = true
+        callback()
+    }
 }
 
 const userStore = new UserStore()
