@@ -1,4 +1,6 @@
-const webApiUrl = "http://mmflow-backend.mehtasanket.in/expense"
+const webApiUrl = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:8090/expense"
+    : "http://mmflow-backend.mehtasanket.in/expense"
 const userSessionHeader = "X-User-Session"
 
 class AuthService {
@@ -14,6 +16,9 @@ class AuthService {
         }
         const request = new Request(webApiUrl + '/login', options)
         const response = await fetch(request)
+        if (!response.ok) {
+            throw new Error(await response.text())
+        }
         return response.headers.get('X-User-Session')
     }
 
@@ -26,7 +31,10 @@ class AuthService {
             headers
         }
         const request = new Request(webApiUrl + '/logout', options)
-        await fetch(request)
+        const response = await fetch(request)
+        if (!response.ok) {
+            throw new Error(await response.text())
+        }
     }
 }
 const authService = new AuthService()
