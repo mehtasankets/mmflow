@@ -1,4 +1,4 @@
-FROM openjdk:11 AS builder
+FROM eclipse-temurin:11-jdk AS builder
 
 COPY . /home/backend
 
@@ -6,7 +6,7 @@ WORKDIR /home/backend
 
 RUN ./gradlew clean build
 
-FROM openjdk:11
+FROM eclipse-temurin:11-jdk
 
 COPY --from=builder /home/backend/build/libs/mmflow-0.0.1-SNAPSHOT-all.jar .
 
