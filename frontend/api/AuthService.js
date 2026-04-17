@@ -1,6 +1,7 @@
-const webApiUrl = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:8090/expense"
-    : "http://mmflow-backend.mehtasanket.in/expense"
+const prodFrontendHosts = ["mmflow.mehtasanket.in"]
+const isProdHost = prodFrontendHosts.includes(window.location.hostname)
+const localBackendUrl = `${window.location.protocol}//${window.location.hostname}:8090/expense`
+const webApiUrl = isProdHost ? "http://mmflow-backend.mehtasanket.in/expense" : localBackendUrl
 const userSessionHeader = "X-User-Session"
 
 class AuthService {
