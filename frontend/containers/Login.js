@@ -5,6 +5,8 @@ import GoogleLogin from 'react-google-login'
 import Header from './Header'
 import User from '../store/User'
 
+const prodFrontendHosts = ['mmflow.mehtasanket.in']
+
 @inject('UserStore')
 @observer
 class Login extends Component {
@@ -29,8 +31,7 @@ class Login extends Component {
     }
 
     isLocalDev = () => {
-        const hostname = window.location.hostname
-        return hostname === 'localhost' || hostname === '127.0.0.1'
+        return !prodFrontendHosts.includes(window.location.hostname)
     }
 
     loginForDev = () => {

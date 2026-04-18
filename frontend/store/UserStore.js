@@ -30,10 +30,18 @@ class UserStore {
         callback()
     }
 
-    @action loginForDev = (callback) => {
-        this.user = new User("test-123", "dev-user", "Local Dev User", "")
-        this.isAuthenticated = true
-        callback()
+    @action loginForDev = async (callback) => {
+        const user = new User("", "dev-user", "Local Dev User", "")
+        try {
+            user.sessionId = await authService.login(user)
+            this.user = user
+            this.isAuthenticated = true
+            callback()
+        } catch (e) {
+            console.error("From userStore.loginForDev:", e)
+            this.user = null
+            this.isAuthenticated = false
+        }
     }
 }
 

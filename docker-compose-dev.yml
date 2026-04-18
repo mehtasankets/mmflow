@@ -7,10 +7,10 @@ services:
     backend:
         build: ./backend
         environment: 
-            - MMFLOW_DB_PATH=/mmflow.db
+            - MMFLOW_DB_PATH=/data/mmflow.db
             - CLIENT_ID
             - JAVA_TOOL_OPTIONS=-Dapp.mode=dev
         ports:
             - "8090:8090"
         volumes:
-            - ${MMFLOW_DB_HOST_LOCATION}:/mmflow.db
+            - ${MMFLOW_DB_HOST_LOCATION}:/data
