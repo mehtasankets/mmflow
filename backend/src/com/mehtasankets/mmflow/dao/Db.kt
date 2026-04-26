@@ -6,6 +6,7 @@ import com.mehtasankets.mmflow.domain.Expense
 import com.mehtasankets.mmflow.domain.ExpenseSheet
 import com.mehtasankets.mmflow.domain.SummaryData
 import com.mehtasankets.mmflow.domain.User
+import java.io.File
 import java.sql.DriverManager
 import java.time.Instant
 import kotlin.math.roundToInt
@@ -16,7 +17,8 @@ class Db {
     private var objectMapper: ObjectMapper
 
     init {
-        val dbPath = System.getenv("MMFLOW_DB_PATH")
+        val dbPath = System.getenv("MMFLOW_DB_PATH") ?: "${System.getProperty("java.io.tmpdir")}/mmflow.db"
+        File(dbPath).parentFile?.mkdirs()
         dbUrl = "jdbc:sqlite:$dbPath"
         objectMapper = ObjectMapper().findAndRegisterModules()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)

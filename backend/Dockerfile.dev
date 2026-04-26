@@ -1,0 +1,20 @@
+FROM eclipse-temurin:11-jdk AS builder
+
+COPY . /home/backend
+
+WORKDIR /home/backend
+
+RUN ./gradlew clean build
+
+FROM eclipse-temurin:11-jdk
+
+WORKDIR /app
+
+COPY --from=builder /home/backend/build/libs/mmflow-0.0.1-SNAPSHOT-all.jar /app/
+COPY entrypoint-dev.sh /app/
+
+RUN chmod +x /app/entrypoint-dev.sh
+
+EXPOSE 8090
+
+ENTRYPOINT ["/app/entrypoint-dev.sh"]

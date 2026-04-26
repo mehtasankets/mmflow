@@ -33,11 +33,15 @@ val db = Db()
 val loggedInUsersCache = mutableMapOf<String, User>()
 var verifier: GoogleIdTokenVerifier =
     GoogleIdTokenVerifier.Builder(NetHttpTransport(), JacksonFactory.getDefaultInstance())
-        .setAudience(listOf(System.getenv("CLIENT_ID")))
+        .setAudience(listOfNotNull(System.getenv("CLIENT_ID")))
         .build()
 
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+
+fun isProdMode(): Boolean {
+    return System.getProperty("app.mode", "prod").equals("prod", true)
+}
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
@@ -63,7 +67,7 @@ fun Application.module(@Suppress("UNUSED_PARAMETER") testing: Boolean = false) {
     }
 
     intercept(ApplicationCallPipeline.Call) {
-        if (!call.request.uri.contains("/login") && System.getProperty("app.mode", "prod").equals("prod", true)) {
+        if (!call.request.uri.contains("/login") && isProdMode()) {
             val authenticationResult = AuthenticationUtil.authenticate(call)
             if (!authenticationResult.first) {
                 call.respondText("Unauthenticated call", status = HttpStatusCode.Unauthorized)
@@ -76,7 +80,7 @@ fun Application.module(@Suppress("UNUSED_PARAMETER") testing: Boolean = false) {
 
             post("/login") {
                 var sessionId = "${UUID.randomUUID()}-${System.currentTimeMillis()}"
-                val user = if (System.getProperty("app.mode", "prod").equals("prod", true)) {
+                val user = if (isProdMode()) {
                     val user = objectMapper.readValue<User>(call.receiveText())
                     val idToken: GoogleIdToken? = withContext(Dispatchers.IO) {
                         verifier.verify(user.idToken)
@@ -216,10 +220,12 @@ fun Application.module(@Suppress("UNUSED_PARAMETER") testing: Boolean = false) {
 }
 
 fun getUser(call: ApplicationCall): User {
-    val userSession = if (System.getProperty("app.mode", "prod").equals("prod", true)) {
-        call.sessions.get(Constants.USER_SESSION_HEADER) as UserSession
-    } else {
-        UserSession("test-123")
+    if (isProdMode()) {
+        val userSession = call.sessions.get(Constants.USER_SESSION_HEADER) as UserSession
+        return loggedInUsersCache[userSession.sessionId]!!
     }
-    return loggedInUsersCache[userSession.sessionId]!!
+
+    val devUserSession = (call.sessions.get(Constants.USER_SESSION_HEADER) as? UserSession) ?: UserSession("test-123")
+    val devUser = User(devUserSession.sessionId, "test-token", "tester", "dev, tester", "")
+    return loggedInUsersCache.getOrPut(devUserSession.sessionId) { devUser }
 }

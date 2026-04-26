@@ -5,9 +5,16 @@ import GoogleLogin from 'react-google-login'
 import Header from './Header'
 import User from '../store/User'
 
+const prodFrontendHosts = ['mmflow.mehtasanket.in']
+
 @inject('UserStore')
 @observer
 class Login extends Component {
+    componentDidMount() {
+        if (this.props.UserStore.isAuthenticated) {
+            this.props.history.replace('/welcome')
+        }
+    }
 
     login = (response) => {
         const profile = response.getBasicProfile()
@@ -28,6 +35,20 @@ class Login extends Component {
         Window.alert(response)
     }
 
+    isLocalDev = () => {
+        return !prodFrontendHosts.includes(window.location.hostname)
+    }
+
+    loginForDev = () => {
+        this.props.UserStore.loginForDev(() => {
+            let destination = '/welcome'
+            if (this.props.location.state && this.props.location.state.from) {
+                destination = this.props.location.state.from
+            }
+            this.props.history.push(destination)
+        })
+    }
+
     render() {
         return <div className='login'>
             <Header {...this.props} />
@@ -39,6 +60,12 @@ class Login extends Component {
                 cookiePolicy={'single_host_origin'}
                 isSignedIn={true}
             />
+            {
+                this.isLocalDev() &&
+                <div style={{ marginTop: '1rem' }}>
+                    <button className="btn btn-secondary" onClick={this.loginForDev}>Continue as Dev User</button>
+                </div>
+            }
         </div >
     }
 }

@@ -1,5 +1,15 @@
-const webApiUrl = "http://mmflow-backend.mehtasanket.in/expense"
+const prodFrontendHosts = ["mmflow.mehtasanket.in"]
+const isProdHost = prodFrontendHosts.includes(window.location.hostname)
+const localBackendUrl = `${window.location.protocol}//${window.location.hostname}:8090/expense`
+const webApiUrl = isProdHost ? "http://mmflow-backend.mehtasanket.in/expense" : localBackendUrl
 const userSessionHeader = "X-User-Session"
+
+const parseJsonOrThrow = async (response) => {
+    if (!response.ok) {
+        throw new Error(await response.text())
+    }
+    return response.json()
+}
 
 class ExpenseService {
     fetchExpenseSheets = async (user) => {
@@ -12,7 +22,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
 
     createExpenseSheets = async (user, expenseSheets) => {
@@ -27,7 +37,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
 
     shareExpenseSheets = async (user, sharingDetails) => {
@@ -42,7 +52,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
 
     deleteExpenseSheets = async (user, expenseSheetNames) => {
@@ -57,7 +67,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl + `/expenseSheet`, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
 
     get = async (user, expenseSheetName, startDate, endDate) => {
@@ -70,7 +80,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl + `?expenseSheetName=${expenseSheetName}&startDate=${startDate}&endDate=${endDate}`, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
     fetchSummary = async (user, expenseSheetName) => {
         const headers = new Headers()
@@ -82,7 +92,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl + `/summary?expenseSheetName=${expenseSheetName}`, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
     post = async(user, expenseSheetName, expenses) => {
         expenses.map(e => e.expenseSheetName = expenseSheetName)
@@ -97,7 +107,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
     put = async(user, expenseSheetName, expenses) => {
         expenses.map(e => e.expenseSheetName = expenseSheetName)
@@ -112,7 +122,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
     delete = async(user, expenseSheetName, expenseIds) => {
         const data = { expenseSheetName: expenseSheetName, expenseIds: expenseIds }
@@ -127,7 +137,7 @@ class ExpenseService {
         }
         const request = new Request(webApiUrl, options)
         const response = await fetch(request)
-        return response.json()
+        return parseJsonOrThrow(response)
     }
 }
 const expenseService = new ExpenseService()
