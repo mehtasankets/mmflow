@@ -7,7 +7,6 @@ import com.mehtasankets.mmflow.domain.ExpenseSheet
 import com.mehtasankets.mmflow.domain.SummaryData
 import com.mehtasankets.mmflow.domain.User
 import java.io.File
-import java.sql.Connection
 import java.sql.DriverManager
 import java.time.Instant
 import kotlin.math.roundToInt
@@ -23,88 +22,9 @@ class Db {
         dbUrl = "jdbc:sqlite:$dbPath"
         objectMapper = ObjectMapper().findAndRegisterModules()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        initializeDatabase()
     }
 
     private fun createConnection() = DriverManager.getConnection(dbUrl)
-
-    private fun initializeDatabase() {
-        createConnection().use { conn ->
-            if (!tableExists(conn, "expenses")) {
-                conn.createStatement().use { stmt ->
-                    stmt.executeUpdate(
-                        """
-                        CREATE TABLE expenses (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            date TEXT NOT NULL,
-                            description TEXT NOT NULL,
-                            category TEXT,
-                            paid_by TEXT,
-                            amount REAL
-                        )
-                        """.trimIndent()
-                    )
-                }
-            }
-
-            if (!columnExists(conn, "expenses", "expense_sheet_name")) {
-                conn.createStatement().use { stmt ->
-                    stmt.executeUpdate(
-                        """
-                        ALTER TABLE expenses
-                        ADD expense_sheet_name TEXT NOT NULL DEFAULT 'Monthly Expenses'
-                        """.trimIndent()
-                    )
-                }
-            }
-
-            if (!tableExists(conn, "expense_sheets")) {
-                conn.createStatement().use { stmt ->
-                    stmt.executeUpdate(
-                        """
-                        CREATE TABLE expense_sheets (
-                            user_identity TEXT NOT NULL,
-                            name TEXT NOT NULL PRIMARY KEY,
-                            description TEXT NOT NULL,
-                            shared_with TEXT
-                        )
-                        """.trimIndent()
-                    )
-                }
-            }
-
-            conn.prepareStatement(
-                """
-                INSERT OR IGNORE INTO expense_sheets (user_identity, name, description, shared_with)
-                VALUES (?, ?, ?, ?)
-                """.trimIndent()
-            ).use { stmt ->
-                stmt.setString(1, "103061349669344984576")
-                stmt.setString(2, "Monthly Expenses")
-                stmt.setString(3, "To manage monthly expenditures")
-                stmt.setString(4, null)
-                stmt.executeUpdate()
-            }
-
-            conn.createStatement().use { stmt ->
-                stmt.executeUpdate("UPDATE expenses SET category = 'Groceries' WHERE category = 'Food'")
-                stmt.executeUpdate("UPDATE expenses SET category = 'Trips' WHERE category = 'Travel'")
-                stmt.executeUpdate("UPDATE expenses SET category = 'Transport' WHERE category = 'Fuel'")
-            }
-        }
-    }
-
-    private fun tableExists(conn: Connection, tableName: String): Boolean {
-        conn.metaData.getTables(null, null, tableName, null).use { tables ->
-            return tables.next()
-        }
-    }
-
-    private fun columnExists(conn: Connection, tableName: String, columnName: String): Boolean {
-        conn.metaData.getColumns(null, null, tableName, columnName).use { columns ->
-            return columns.next()
-        }
-    }
 
     fun fetchExpenseSheets(user: User): List<ExpenseSheet> {
         val query = """

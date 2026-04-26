@@ -5,7 +5,9 @@ services:
         ports:
             - "8080:8080"
     backend:
-        build: ./backend
+        build:
+            context: ./backend
+            dockerfile: Dockerfile.dev
         environment: 
             - MMFLOW_DB_PATH=/data/mmflow.db
             - CLIENT_ID
