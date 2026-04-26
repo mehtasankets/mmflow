@@ -10,6 +10,11 @@ const prodFrontendHosts = ['mmflow.mehtasanket.in']
 @inject('UserStore')
 @observer
 class Login extends Component {
+    componentDidMount() {
+        if (this.props.UserStore.isAuthenticated) {
+            this.props.history.replace('/welcome')
+        }
+    }
 
     login = (response) => {
         const profile = response.getBasicProfile()
