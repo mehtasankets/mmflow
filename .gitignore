@@ -63,6 +63,7 @@ typings/
 # Env file
 dev-env.list
 prod-env.list
+mmflow.db/
 
 # Frontend dist
 dist/
