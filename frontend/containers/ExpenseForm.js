@@ -1,49 +1,75 @@
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
-import Flatpickr from 'react-flatpickr'
 import { Modal, Form, Col, Button } from 'react-bootstrap'
 
 @inject('ExpenseStore', 'UserStore')
 @observer
 class ExpenseForm extends Component {
-
-    addNewExpense = (e) => {
-        const expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
-        e.preventDefault()
-        this.props.ExpenseStore.expense.expenseSheetName = expenseSheetName
-        if (this.date) {
-            this.props.ExpenseStore.expense.date = this.date
-            this.date = null
-        }
-        if (this.description) {
-            this.props.ExpenseStore.expense.description = this.description
-            this.description = null
-        }
-        if (this.category) {
-            this.props.ExpenseStore.expense.category = this.category
-            this.category = null
-        }
-        if (this.paidBy) {
-            this.props.ExpenseStore.expense.paidBy = this.paidBy
-            this.paidBy = null
-        }
-        if (this.amount) {
-            this.props.ExpenseStore.expense.amount = this.amount
-            this.amount = null
-        }
-
-        if (this.props.ExpenseStore.actionType == "New") {
-            this.props.ExpenseStore.expense.id = -1
-            this.props.ExpenseStore.addNewExpense(this.props.UserStore.user, expenseSheetName)
-        } else {
-            this.props.ExpenseStore.updateExpense(this.props.UserStore.user, expenseSheetName)
-        }
-        this.props.ExpenseStore.showForm = false
+    constructor(props) {
+        super(props)
+        this.state = this.getFormState(props.ExpenseStore.expense)
     }
 
-    saveChanges = (e) => {
-        if (e.charCode == 13) {
+    componentDidUpdate(prevProps) {
+        const { ExpenseStore } = this.props
+        if (ExpenseStore.showForm && ExpenseStore.expense !== prevProps.ExpenseStore.expense) {
+            this.setState(this.getFormState(ExpenseStore.expense))
+        }
+    }
+
+    getFormState = (expense) => ({
+        date: this.formatDateForInput(expense.date),
+        category: expense.category || "Groceries",
+        amount: expense.amount === 0 || expense.amount ? expense.amount.toString() : "",
+        paidBy: expense.paidBy || "Sanket",
+        description: expense.description || ""
+    })
+
+    formatDateForInput = (date) => {
+        if (!date) {
+            return ""
+        }
+        const normalizedDate = new Date(date)
+        const year = normalizedDate.getFullYear()
+        const month = `${normalizedDate.getMonth() + 1}`.padStart(2, "0")
+        const day = `${normalizedDate.getDate()}`.padStart(2, "0")
+        return `${year}-${month}-${day}`
+    }
+
+    updateField = (field) => (e) => {
+        this.setState({ [field]: e.target.value })
+    }
+
+    handleShortcutSubmit = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key == "Enter") {
             this.addNewExpense(e)
+        }
+    }
+
+    addNewExpense = async (e) => {
+        const expenseSheetName = new URLSearchParams(this.props.location.search).get("expenseSheetName")
+        e.preventDefault()
+        const { ExpenseStore } = this.props
+        const { date, description, category, paidBy, amount } = this.state
+
+        ExpenseStore.expense.expenseSheetName = expenseSheetName
+        ExpenseStore.expense.date = date ? new Date(`${date}T00:00:00`) : new Date()
+        ExpenseStore.expense.description = description
+        ExpenseStore.expense.category = category
+        ExpenseStore.expense.paidBy = paidBy
+        ExpenseStore.expense.amount = amount === "" ? 0 : parseFloat(amount)
+
+        let saveSuccessful = false
+        if (ExpenseStore.actionType == "New") {
+            ExpenseStore.expense.id = -1
+            saveSuccessful = await ExpenseStore.addNewExpense(this.props.UserStore.user, expenseSheetName)
+        } else {
+            saveSuccessful = await ExpenseStore.updateExpense(this.props.UserStore.user, expenseSheetName)
+        }
+
+        if (saveSuccessful) {
+            this.setState(this.getFormState(ExpenseStore.expense))
+            ExpenseStore.showForm = false
         }
     }
 
@@ -56,17 +82,26 @@ class ExpenseForm extends Component {
                 <Modal.Title>{ExpenseStore.actionType}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form>
+                <Form onSubmit={this.addNewExpense} onKeyDown={this.handleShortcutSubmit}>
                     <Form.Row>
                         <Form.Group as={Col} md="4">
-                            <Form.Label>Date</Form.Label><br />
-                            <Flatpickr className='date-picker' placeholder='enter date'
-                                defaultValue={ExpenseStore.expense.date.toISOString()} onChange={value => this.date = value[0]} />
+                            <Form.Label htmlFor="expense-date">Date</Form.Label>
+                            <Form.Control
+                                id="expense-date"
+                                type="date"
+                                value={this.state.date}
+                                onChange={this.updateField("date")}
+                                autoFocus={ExpenseStore.actionType == "New"}
+                            />
                         </Form.Group>
                         <Form.Group as={Col}>
-                            <Form.Label>Category</Form.Label>
-                            <Form.Control as="select"
-                                defaultValue={ExpenseStore.expense.category} autoFocus onChange={e => this.category = e.target.value}>
+                            <Form.Label htmlFor="expense-category">Category</Form.Label>
+                            <Form.Control
+                                id="expense-category"
+                                as="select"
+                                value={this.state.category}
+                                onChange={this.updateField("category")}
+                                autoFocus={ExpenseStore.actionType != "New"}>
                                 <option value="Groceries">Groceries</option>
                                 <option value="ReadyMadeFood">Ready made food</option>
                                 <option value="Bills">Bills</option>
@@ -89,30 +124,47 @@ class ExpenseForm extends Component {
                     </Form.Row>
                     <Form.Row>
                         <Form.Group as={Col} md="4">
-                            <Form.Label>Amount</Form.Label>
-                            <Form.Control type="number" placeholder="Enter amount" min={0} step='0.01' onKeyPress={this.saveChanges}
-                                defaultValue={ExpenseStore.expense.amount} onChange={e => this.amount = e.target.value} />
+                            <Form.Label htmlFor="expense-amount">Amount</Form.Label>
+                            <Form.Control
+                                id="expense-amount"
+                                type="number"
+                                placeholder="Enter amount"
+                                min={0}
+                                step='0.01'
+                                inputMode="decimal"
+                                value={this.state.amount}
+                                onChange={this.updateField("amount")}
+                            />
                         </Form.Group>
                         <Form.Group as={Col}>
-                            <Form.Label>Paid By</Form.Label>
-                            <Form.Control as="select"
-                                defaultValue={ExpenseStore.expense.paidBy} onChange={e => this.paidBy = e.target.value}>
+                            <Form.Label htmlFor="expense-paid-by">Paid By</Form.Label>
+                            <Form.Control
+                                id="expense-paid-by"
+                                as="select"
+                                value={this.state.paidBy}
+                                onChange={this.updateField("paidBy")}>
                                 <option value="Sanket">Sanket</option>
                                 <option value="Priyanka">Priyanka</option>
                             </Form.Control>
                         </Form.Group>
                     </Form.Row>
                     <Form.Group>
-                        <Form.Label>Description</Form.Label>
-                        <Form.Control as="textarea" rows="2" placeholder="Enter description" onKeyPress={this.saveChanges}
-                            defaultValue={ExpenseStore.expense.description} onChange={e => this.description = e.target.value} />
+                        <Form.Label htmlFor="expense-description">Description</Form.Label>
+                        <Form.Control
+                            id="expense-description"
+                            as="textarea"
+                            rows="2"
+                            placeholder="Enter description"
+                            value={this.state.description}
+                            onChange={this.updateField("description")}
+                        />
                     </Form.Group>
+                    <Modal.Footer className="expense-form-footer">
+                        <Button variant="primary" type="submit">Save changes</Button>
+                        <Button variant="secondary" onClick={handleClose}>Close</Button>
+                    </Modal.Footer>
                 </Form>
             </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose} tabIndex={1}>Close</Button>
-                <Button variant="primary" onClick={e => this.addNewExpense(e)} tabIndex={0}>Save changes</Button>
-            </Modal.Footer>
         </Modal>
     }
 }

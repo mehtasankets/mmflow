@@ -4,7 +4,7 @@ import Summary from './Summary'
 import SummaryData from './SummaryData'
 import expenseService from '../api/ExpenseService'
 
-const defaultExpense = new Expense("", -1, new Date().toISOString(), "", "Groceries", "Sanket", 0)
+const createDefaultExpense = () => new Expense("", -1, new Date().toISOString(), "", "Groceries", "Sanket", "")
 
 const defaultSummary = new Summary("", new SummaryData(), new SummaryData())
 
@@ -12,7 +12,7 @@ class ExpenseStore {
     // List of expenses to be shown in the grid
     @observable expenses = []
     // Expense being added / modified
-    @observable expense = Object.assign({}, defaultExpense)
+    @observable expense = Object.assign({}, createDefaultExpense())
     // New / Update
     @observable actionType = "New"
     // show / hide form
@@ -48,27 +48,31 @@ class ExpenseStore {
     @action addNewExpense = async (user, expenseSheetName) => {
         const data = await expenseService.post(user, expenseSheetName, [this.expense])
         if (data == 1) {
-            this.expense = Object.assign({}, defaultExpense)
+            this.expense = Object.assign({}, createDefaultExpense())
             this.expenses = []
             this.getExpenses(user, expenseSheetName)
             this.fetchSummary(user, expenseSheetName)
+            return true
         }
+        return false
     }
 
     @action updateExpense = async (user, expenseSheetName) => {
         const data = await expenseService.put(user, expenseSheetName, [this.expense])
         if (data == 1) {
-            this.expense = Object.assign({}, defaultExpense)
+            this.expense = Object.assign({}, createDefaultExpense())
             this.expenses = []
             this.getExpenses(user, expenseSheetName)
             this.fetchSummary(user, expenseSheetName)
+            return true
         }
+        return false
     }
 
     @action deleteExpenses = async (user, expenseSheetName, ids) => {
         const count = await expenseService.delete(user, expenseSheetName, ids)
         if (count > 0) {
-            this.expense = Object.assign({}, defaultExpense)
+            this.expense = Object.assign({}, createDefaultExpense())
             this.showDeletionConfirmationDialog = false
             this.getExpenses(user, expenseSheetName)
             this.fetchSummary(user, expenseSheetName)
