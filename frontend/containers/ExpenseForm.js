@@ -129,7 +129,6 @@ class ExpenseForm extends Component {
                                 id="expense-amount"
                                 type="number"
                                 placeholder="Enter amount"
-                                min={0}
                                 step='0.01'
                                 inputMode="decimal"
                                 value={this.state.amount}
