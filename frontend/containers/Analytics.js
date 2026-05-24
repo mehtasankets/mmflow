@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
-import { Row, Col, Card } from 'react-bootstrap'
 import { CartesianGrid, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, LabelList } from 'recharts'
 
 const renderCustomizedLabel = (props) => {
@@ -52,34 +51,31 @@ class Analytics extends Component {
     render() {
         const { ExpenseStore } = this.props
         return <div className='main-component analytics'>
-            <Row className='analytics-row'>
-                <Col className='analytics-col' lg={12}>
-                    <Card>
-                        <Card.Header>Month on month expenses</Card.Header>
-                        <Card.Body>
-                            <Row style={{ height: "100%" }}>
-                                <Col className="center-align right-border">
-                                    <BarChart width={1000} height={500} data={this.constructMonthOnMonthAggregates(
-                                        ExpenseStore.expenses
-                                    )}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-				                        <XAxis dataKey="month" />
-				                        <YAxis />
-				                        <Tooltip />
-				                        <Legend />
-				                        <Bar dataKey="amountBySanket" stackId="a" fill="#8884d8">
-                                            <LabelList dataKey="amount" content={renderCustomizedLabel} />
-                                        </Bar>
-				                        <Bar dataKey="amountByPriyanka" stackId="a" fill="#82ca9d">
-                                            <LabelList dataKey="amount" content={renderCustomizedLabel} />
-                                        </Bar>
-                                    </BarChart>
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+            <section className="analytics-card">
+                <div className="analytics-card-header">
+                    <p className="analytics-card-kicker">Timeline</p>
+                    <h2 className="analytics-card-title">Month on month expenses</h2>
+                </div>
+                <div className="analytics-card-body">
+                    <div className="analytics-chart-wrap">
+                        <BarChart width={1000} height={500} data={this.constructMonthOnMonthAggregates(
+                            ExpenseStore.expenses
+                        )}>
+                            <CartesianGrid strokeDasharray="3 3" />
+		                    <XAxis dataKey="month" />
+		                    <YAxis />
+		                    <Tooltip />
+		                    <Legend />
+		                    <Bar dataKey="amountBySanket" stackId="a" fill="#c75b39">
+                                <LabelList dataKey="amount" content={renderCustomizedLabel} />
+                            </Bar>
+		                    <Bar dataKey="amountByPriyanka" stackId="a" fill="#7a9e7e">
+                                <LabelList dataKey="amount" content={renderCustomizedLabel} />
+                            </Bar>
+                        </BarChart>
+                    </div>
+                </div>
+            </section>
         </div>
     }
 }

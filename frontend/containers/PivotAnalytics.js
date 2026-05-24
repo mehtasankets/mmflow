@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
-import { Row, Col, Card } from 'react-bootstrap'
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import 'react-pivottable/pivottable.css';
 import TableRenderers from 'react-pivottable/TableRenderers';
@@ -32,25 +31,20 @@ class PivotAnalytics extends Component {
         const PlotlyRenderers = createPlotlyRenderers(Plot);
         const { ExpenseStore } = this.props
         return <div className='main-component pivot-analytics'>
-            <Row className='pivot-analytics-row'>
-                <Col className='pivot-analytics-col' lg={12}>
-                    <Card>
-                        <Card.Header>Pivot Analyzer</Card.Header>
-                        <Card.Body>
-                            <Row style={{ height: "100%" }}>
-                                <Col className="center-align right-border">
-                                    <PivotTableUI
-                                        data={this.formatData(ExpenseStore.expenses)}
-                                        onChange={s => this.setState(s)}
-                                        renderers={Object.assign({}, TableRenderers, PlotlyRenderers)}
-                                        {...this.state}
-                                    />
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+            <section className="pivot-card">
+                <div className="pivot-card-header">
+                    <p className="pivot-card-kicker">Explore</p>
+                    <h2 className="pivot-card-title">Pivot analyzer</h2>
+                </div>
+                <div className="pivot-card-body">
+                    <PivotTableUI
+                        data={this.formatData(ExpenseStore.expenses)}
+                        onChange={s => this.setState(s)}
+                        renderers={Object.assign({}, TableRenderers, PlotlyRenderers)}
+                        {...this.state}
+                    />
+                </div>
+            </section>
         </div>
     }
 }

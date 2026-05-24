@@ -52,20 +52,30 @@ class Login extends Component {
     render() {
         return <div className='login'>
             <Header {...this.props} />
-            <GoogleLogin
-                clientId="534936470564-h75v3gcql2vlrph63qc0i1scsdbak94h.apps.googleusercontent.com"
-                buttonText="Login"
-                onSuccess={this.login}
-                onFailure={this.showException}
-                cookiePolicy={'single_host_origin'}
-                isSignedIn={true}
-            />
-            {
-                this.isLocalDev() &&
-                <div style={{ marginTop: '1rem' }}>
-                    <button className="btn btn-secondary" onClick={this.loginForDev}>Continue as Dev User</button>
+            <div className="login-shell">
+                <div className="login-panel">
+                    <h1 className="login-title">Track spending with less friction</h1>
+                    <p className="login-subtitle">
+                        Sign in to review shared expenses, spot trends quickly, and update entries from any screen size.
+                    </p>
+                    <div className="login-actions">
+                        <GoogleLogin
+                            clientId="534936470564-h75v3gcql2vlrph63qc0i1scsdbak94h.apps.googleusercontent.com"
+                            buttonText="Login with Google"
+                            onSuccess={this.login}
+                            onFailure={this.showException}
+                            cookiePolicy={'single_host_origin'}
+                            isSignedIn={true}
+                        />
+                        {
+                            this.isLocalDev() &&
+                            <div className="login-dev-action">
+                                <button className="btn btn-outline-secondary btn-block" onClick={this.loginForDev}>Continue as Dev User</button>
+                            </div>
+                        }
+                    </div>
                 </div>
-            }
+            </div>
         </div >
     }
 }

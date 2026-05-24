@@ -16,20 +16,26 @@ class Header extends Component {
     render() {
         const { UserStore } = this.props
         return <div className='header-bar'>
-            <Navbar bg="dark" variant="dark" fixed='top'>
-                <Navbar.Brand href="/welcome">
-                    <GiWallet size={2} className='logo' />{' '}Monthly money flow
+            <Navbar bg="dark" variant="dark" fixed='top' expand="md" className="app-navbar">
+                <Navbar.Brand href="/welcome" className="app-navbar-brand">
+                    <GiWallet size={2} className='logo' />
+                    <span className="brand-text">Monthly money flow</span>
                 </Navbar.Brand>
                 {
                     UserStore.isAuthenticated ?
-                    <Navbar.Collapse className="justify-content-end">
-                        <Image className="profile-pic" src={UserStore.user.profilePicUrl} roundedCircle />
-                        <DropdownButton variant="dark" alignRight id="dropdown-basic-button" title={UserStore.user.displayName}>
-                            <Dropdown.Item onClick={this.logout}>
-                                Logout
-                            </Dropdown.Item>
-                        </DropdownButton>
-                    </Navbar.Collapse>
+                    <div className="app-navbar-actions">
+                        <Navbar.Toggle aria-controls="app-navbar-nav" />
+                        <Navbar.Collapse id="app-navbar-nav" className="justify-content-end">
+                            <div className="user-menu">
+                                <Image className="profile-pic" src={UserStore.user.profilePicUrl} roundedCircle />
+                                <DropdownButton variant="dark" alignRight id="dropdown-basic-button" title={UserStore.user.displayName}>
+                                    <Dropdown.Item onClick={this.logout}>
+                                        Logout
+                                    </Dropdown.Item>
+                                </DropdownButton>
+                            </div>
+                        </Navbar.Collapse>
+                    </div>
                     : null
                 }
             </Navbar>

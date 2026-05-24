@@ -1,6 +1,45 @@
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
-import { Modal, Form, Col, Button } from 'react-bootstrap'
+
+const CATEGORY_OPTIONS = [
+    ["Groceries", "Groceries"],
+    ["ReadyMadeFood", "Ready made food"],
+    ["Bills", "Bills"],
+    ["Entertainment", "Entertainment"],
+    ["Transport", "Transport"],
+    ["HouseUtilities", "House utilities"],
+    ["Toys", "Toys"],
+    ["Books", "Books"],
+    ["Health", "Health"],
+    ["Education", "Education"],
+    ["Painting", "Painting"],
+    ["Clothes", "Clothes"],
+    ["Trips", "Trips"],
+    ["Gifts", "Gifts"],
+    ["PersonalGrooming", "Personal grooming"],
+    ["ExtendedFamilyExpenses", "Extended family"],
+    ["Misc", "Misc"]
+]
+
+const CATEGORY_EMOJI = {
+    Groceries: "🛍️",
+    ReadyMadeFood: "🍽️",
+    Bills: "📄",
+    Entertainment: "🎬",
+    Transport: "🚕",
+    HouseUtilities: "🏠",
+    Toys: "🧸",
+    Books: "📚",
+    Health: "💊",
+    Education: "🎓",
+    Painting: "🎨",
+    Clothes: "👕",
+    Trips: "✈️",
+    Gifts: "🎁",
+    PersonalGrooming: "✨",
+    ExtendedFamilyExpenses: "👪",
+    Misc: "📎"
+}
 
 @inject('ExpenseStore', 'UserStore')
 @observer
@@ -8,11 +47,20 @@ class ExpenseForm extends Component {
     constructor(props) {
         super(props)
         this.state = this.getFormState(props.ExpenseStore.expense)
+        this.lastSyncedExpenseKey = this.getExpenseSyncKey(props.ExpenseStore.expense, props.ExpenseStore.actionType)
+        this.dateInputRef = React.createRef()
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
         const { ExpenseStore } = this.props
-        if (ExpenseStore.showForm && ExpenseStore.expense !== prevProps.ExpenseStore.expense) {
+        if (!ExpenseStore.showForm) {
+            this.lastSyncedExpenseKey = null
+            return
+        }
+
+        const nextExpenseKey = this.getExpenseSyncKey(ExpenseStore.expense, ExpenseStore.actionType)
+        if (nextExpenseKey !== this.lastSyncedExpenseKey) {
+            this.lastSyncedExpenseKey = nextExpenseKey
             this.setState(this.getFormState(ExpenseStore.expense))
         }
     }
@@ -24,6 +72,14 @@ class ExpenseForm extends Component {
         paidBy: expense.paidBy || "Sanket",
         description: expense.description || ""
     })
+
+    getExpenseSyncKey = (expense, actionType) => {
+        return JSON.stringify({
+            id: expense.id,
+            actionType,
+            ...this.getFormState(expense)
+        })
+    }
 
     formatDateForInput = (date) => {
         if (!date) {
@@ -40,9 +96,36 @@ class ExpenseForm extends Component {
         this.setState({ [field]: e.target.value })
     }
 
+    setCategory = (category) => {
+        this.setState({ category })
+    }
+
+    setPaidBy = (paidBy) => {
+        this.setState({ paidBy })
+    }
+
+    openDatePicker = () => {
+        const input = this.dateInputRef.current
+        if (!input) {
+            return
+        }
+
+        input.focus()
+        if (typeof input.showPicker === "function") {
+            input.showPicker()
+        }
+    }
+
     handleShortcutSubmit = (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key == "Enter") {
+        if (e.key == "Enter" && e.target.tagName !== "SELECT" && e.target.type !== "button") {
+            e.preventDefault()
             this.addNewExpense(e)
+        }
+    }
+
+    handleOverlayClick = (e) => {
+        if (e.target === e.currentTarget) {
+            this.props.ExpenseStore.showForm = false
         }
     }
 
@@ -76,95 +159,102 @@ class ExpenseForm extends Component {
     render() {
         const { ExpenseStore } = this.props
         const handleClose = () => { ExpenseStore.showForm = false }
-        return <Modal show={ExpenseStore.showForm} onHide={handleClose} animation={false}
-            size="lg" key={ExpenseStore.expense.description}>
-            <Modal.Header closeButton>
-                <Modal.Title>{ExpenseStore.actionType}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form onSubmit={this.addNewExpense} onKeyDown={this.handleShortcutSubmit}>
-                    <Form.Row>
-                        <Form.Group as={Col} md="4">
-                            <Form.Label htmlFor="expense-date">Date</Form.Label>
-                            <Form.Control
-                                id="expense-date"
-                                type="date"
-                                value={this.state.date}
-                                onChange={this.updateField("date")}
-                                autoFocus={ExpenseStore.actionType == "New"}
-                            />
-                        </Form.Group>
-                        <Form.Group as={Col}>
-                            <Form.Label htmlFor="expense-category">Category</Form.Label>
-                            <Form.Control
-                                id="expense-category"
-                                as="select"
-                                value={this.state.category}
-                                onChange={this.updateField("category")}
-                                autoFocus={ExpenseStore.actionType != "New"}>
-                                <option value="Groceries">Groceries</option>
-                                <option value="ReadyMadeFood">Ready made food</option>
-                                <option value="Bills">Bills</option>
-                                <option value="Entertainment">Entertainment</option>
-                                <option value="Transport">Transport</option>
-                                <option value="HouseUtilities">House utilities</option>
-                                <option value="Toys">Toys</option>
-                                <option value="Books">Books</option>
-                                <option value="Health">Health</option>
-                                <option value="Education">Education</option>
-                                <option value="Painting">Painting</option>
-                                <option value="Clothes">Clothes</option>
-                                <option value="Trips">Trips</option>
-                                <option value="Gifts">Gifts</option>
-                                <option value="PersonalGrooming">Personal Grooming</option>
-                                <option value="ExtendedFamilyExpenses">Extended Family Expenses</option>
-                                <option value="Misc">Misc</option>
-                            </Form.Control>
-                        </Form.Group>
-                    </Form.Row>
-                    <Form.Row>
-                        <Form.Group as={Col} md="4">
-                            <Form.Label htmlFor="expense-amount">Amount</Form.Label>
-                            <Form.Control
+
+        if (!ExpenseStore.showForm) {
+            return null
+        }
+
+        return <div className="expense-form-overlay" onClick={this.handleOverlayClick}>
+            <section className="expense-form-sheet" role="dialog" aria-modal="true" aria-labelledby="expense-form-title">
+                <button type="button" className="expense-form-close" onClick={handleClose} aria-label="Close expense form">×</button>
+                <form className="expense-form-shell" onSubmit={this.addNewExpense} onKeyDown={this.handleShortcutSubmit}>
+                    <header className="expense-form-hero">
+                        <p className="expense-form-kicker">{ExpenseStore.actionType === "New" ? "Log expense" : "Update expense"}</p>
+                        <h2 id="expense-form-title" className="expense-form-title">{ExpenseStore.actionType === "New" ? "Add an entry" : "Refine this entry"}</h2>
+                        <div className="expense-form-amount-wrap">
+                            <span className="expense-form-currency">₹</span>
+                            <input
                                 id="expense-amount"
+                                className="expense-form-amount-input"
                                 type="number"
-                                placeholder="Enter amount"
-                                step='0.01'
+                                placeholder="0"
+                                step="0.01"
                                 inputMode="decimal"
                                 value={this.state.amount}
                                 onChange={this.updateField("amount")}
+                                autoFocus
                             />
-                        </Form.Group>
-                        <Form.Group as={Col}>
-                            <Form.Label htmlFor="expense-paid-by">Paid By</Form.Label>
-                            <Form.Control
-                                id="expense-paid-by"
-                                as="select"
-                                value={this.state.paidBy}
-                                onChange={this.updateField("paidBy")}>
-                                <option value="Sanket">Sanket</option>
-                                <option value="Priyanka">Priyanka</option>
-                            </Form.Control>
-                        </Form.Group>
-                    </Form.Row>
-                    <Form.Group>
-                        <Form.Label htmlFor="expense-description">Description</Form.Label>
-                        <Form.Control
-                            id="expense-description"
-                            as="textarea"
-                            rows="2"
-                            placeholder="Enter description"
-                            value={this.state.description}
-                            onChange={this.updateField("description")}
-                        />
-                    </Form.Group>
-                    <Modal.Footer className="expense-form-footer">
-                        <Button variant="primary" type="submit">Save changes</Button>
-                        <Button variant="secondary" onClick={handleClose}>Close</Button>
-                    </Modal.Footer>
-                </Form>
-            </Modal.Body>
-        </Modal>
+                        </div>
+                    </header>
+
+                    <div className="expense-form-body">
+                        <section className="expense-form-section">
+                            <label className="expense-form-section-label">Who spent?</label>
+                            <div className="expense-form-person-grid">
+                                {["Sanket", "Priyanka"].map((person) => (
+                                    <button
+                                        key={person}
+                                        type="button"
+                                        className={`expense-form-person-chip${this.state.paidBy === person ? " is-active" : ""}`}
+                                        onClick={() => this.setPaidBy(person)}
+                                    >
+                                        <span className="expense-form-person-avatar">{person.charAt(0)}</span>
+                                        <span>{person}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="expense-form-section">
+                            <label className="expense-form-section-label">Category</label>
+                            <div className="expense-form-category-grid">
+                                {CATEGORY_OPTIONS.map(([value, label]) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        className={`expense-form-category-chip${this.state.category === value ? " is-active" : ""}`}
+                                        onClick={() => this.setCategory(value)}
+                                    >
+                                        <span>{CATEGORY_EMOJI[value] || "📎"}</span>
+                                        <span>{label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </section>
+
+                        <div className="expense-form-input-grid">
+                            <label className="expense-form-field">
+                                <span className="expense-form-section-label">Date</span>
+                                <input
+                                    id="expense-date"
+                                    ref={this.dateInputRef}
+                                    type="date"
+                                    value={this.state.date}
+                                    onChange={this.updateField("date")}
+                                    onClick={this.openDatePicker}
+                                />
+                            </label>
+                            <label className="expense-form-field expense-form-field-wide">
+                                <span className="expense-form-section-label">Description</span>
+                                <input
+                                    id="expense-description"
+                                    type="text"
+                                    placeholder="What was this for?"
+                                    value={this.state.description}
+                                    onChange={this.updateField("description")}
+                                />
+                            </label>
+                        </div>
+                    </div>
+
+                    <footer className="expense-form-actions">
+                        <button type="submit" className="expense-form-submit">Save expense</button>
+                        <button type="button" className="expense-form-cancel" onClick={handleClose}>Cancel</button>
+                    </footer>
+                </form>
+            </section>
+        </div>
     }
 }
+
 export default ExpenseForm
