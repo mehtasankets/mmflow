@@ -5,6 +5,19 @@ import SummaryData from './SummaryData'
 import expenseService from '../api/ExpenseService'
 
 const createDefaultExpense = () => new Expense("", -1, new Date().toISOString(), "", "Groceries", "Sanket", "")
+const formatDateKey = (date) => {
+    const normalizedDate = new Date(date)
+    const year = normalizedDate.getFullYear()
+    const month = `${normalizedDate.getMonth() + 1}`.padStart(2, "0")
+    const day = `${normalizedDate.getDate()}`.padStart(2, "0")
+    return `${year}-${month}-${day}`
+}
+const getCurrentMonthRange = () => {
+    const today = new Date()
+    const start = new Date(today.getFullYear(), today.getMonth(), 1)
+    const endExclusive = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+    return { start, endExclusive }
+}
 
 const defaultSummary = new Summary("", new SummaryData(), new SummaryData())
 
@@ -23,12 +36,25 @@ class ExpenseStore {
     @observable selectedExpenseIds = []
     // Summary
     @observable summary = defaultSummary
+    // Current loaded feed range
+    @observable loadedStartDate = ""
+    @observable loadedEndDate = ""
+
+    @action openNewExpenseForm = () => {
+        this.expense = Object.assign({}, createDefaultExpense())
+        this.actionType = "New"
+        this.showForm = true
+    }
+
+    @action openUpdateExpenseForm = (expense) => {
+        this.expense = expense
+        this.actionType = "Update"
+        this.showForm = true
+    }
 
     @action getExpenses = async (user, expenseSheetName) => {
-        let today = new Date()
-        let startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-        let nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1)
-        await this.getExpensesForDates(user, expenseSheetName, startOfMonth, nextMonthStart)
+        const { start, endExclusive } = getCurrentMonthRange()
+        await this.getExpensesForDates(user, expenseSheetName, start, endExclusive)
     }
 
     @action getExpensesForDates = async (user, expenseSheetName, startDate, endDate) => {
@@ -43,6 +69,8 @@ class ExpenseStore {
             }
             return b.id - a.id
         })
+        this.loadedStartDate = formatDateKey(startDate)
+        this.loadedEndDate = formatDateKey(new Date(new Date(endDate).getTime() - 24 * 60 * 60 * 1000))
     }
 
     @action addNewExpense = async (user, expenseSheetName) => {

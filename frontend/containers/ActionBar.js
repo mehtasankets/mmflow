@@ -20,9 +20,15 @@ class ActionBar extends Component {
     render() {
         const { ExpenseStore } = this.props
         return <div className='main-component action-bar'>
-            <div className='action-row'>
+            <div className='action-surface'>
+                <div className='action-copy'>
+                    <div className='action-title'>Expenses</div>
+                    <div className='action-subtitle'>Add a new entry or remove the ones you have selected.</div>
+                </div>
+                <div className='action-row'>
                 <Button className='action-button' variant="primary" onClick={this.addNewExpense}>Add new expense</Button>
-                <Button className='action-button' variant="danger" onClick={this.deleteExpenses}>Delete expenses</Button>
+                <Button className='action-button' variant="outline-danger" onClick={this.deleteExpenses}>Delete expenses</Button>
+                </div>
             </div>
         </div>
     }
