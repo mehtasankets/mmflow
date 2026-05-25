@@ -149,6 +149,7 @@ class Welcome extends Component {
                 </section>
 
                 <section className="welcome-grid">
+                    {ExpenseSheetStore.expenseSheets.map(this.renderSheetCard)}
                     <article className="welcome-create-card" onClick={() => ExpenseSheetStore.showCreateForm = true} role="button" tabIndex="0" onKeyDown={(event) => {
                         if (event.key === 'Enter' || event.key === ' ') {
                             event.preventDefault()
@@ -161,7 +162,6 @@ class Welcome extends Component {
                         <h2 className="welcome-create-title">Create new expense sheet</h2>
                         <p className="welcome-create-copy">Start a fresh ledger for a trip, a month, or a new household track.</p>
                     </article>
-                    {ExpenseSheetStore.expenseSheets.map(this.renderSheetCard)}
                 </section>
             </main>
 
